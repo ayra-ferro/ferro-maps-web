@@ -1,0 +1,22 @@
+{
+  "name": "ferro-maps-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:marketing": "pnpm --filter @ferro/marketing dev",
+    "dev:admin": "pnpm --filter @ferro/admin dev",
+    "build:marketing": "pnpm --filter @ferro/marketing build",
+    "build:admin": "pnpm --filter @ferro/admin build",
+    "lint": "pnpm --filter \"*\" lint"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.1.3",
+      "onFail": "download"
+    }
+  }
+}
