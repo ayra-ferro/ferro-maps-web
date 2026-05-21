@@ -16,6 +16,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 if (import.meta.env.DEV || import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN;
 }
 
