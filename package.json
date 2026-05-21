@@ -12,6 +12,7 @@
   "devDependencies": {
     "turbo": "latest"
   },
+  "packageManager": "pnpm@11.1.3",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
