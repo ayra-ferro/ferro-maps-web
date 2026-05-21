@@ -24,6 +24,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Type check
+        run: |
+          pnpm --filter marketing tsc --noEmit
+          pnpm --filter admin tsc --noEmit
+
+      - name: Lint
+        run: |
+          pnpm --filter marketing lint
+          pnpm --filter admin lint
+
       - name: Build marketing
         run: pnpm --filter marketing build
 
