@@ -4,3 +4,4 @@ packages:
 allowBuilds:
   '@firebase/util': true
   protobufjs: false
+  sharp: true
