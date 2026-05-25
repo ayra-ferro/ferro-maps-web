@@ -232,6 +232,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0(jiti@1.21.7))
+      '@ferro-maps/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@types/node':
         specifier: ^24.12.3
         version: 24.12.4
@@ -296,6 +299,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0(jiti@1.21.7))
+      '@ferro-maps/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@types/node':
         specifier: ^24.12.3
         version: 24.12.4
@@ -338,6 +344,8 @@ importers:
       vite:
         specifier: ^8.0.12
         version: 8.0.13(@types/node@24.12.4)(jiti@1.21.7)
+
+  packages/config: {}
 
   packages/ui:
     dependencies:
