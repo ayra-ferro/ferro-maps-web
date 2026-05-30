@@ -1,5 +1,6 @@
 import Header from './Header'
 import Hero from './Hero'
+import WhyFerroMaps from './WhyFerroMaps'
 import Footer from './Footer'
 
 export default function App() {
@@ -8,7 +9,9 @@ export default function App() {
       <Header />
       <Hero />
 
-      <main></main>
+      <main>
+        <WhyFerroMaps />
+      </main>
 
       <Footer />
     </div>
