@@ -11,7 +11,7 @@ export default function Hero() {
 
   return (
     <section
-      className={`min-h-screen bg-white flex items-center pt-[88px] transition-opacity duration-deliberate ${
+      className={`bg-white flex items-center pt-[88px] transition-opacity duration-deliberate ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
