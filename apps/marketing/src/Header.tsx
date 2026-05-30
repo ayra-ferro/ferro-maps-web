@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { Menu, X } from 'lucide-react'
 import logo from './assets/ferro-logo.png'
 
 export default function Header() {
   const [visible, setVisible] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     let prevScrollY = window.scrollY
@@ -17,6 +19,13 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const navLinks = [
+    { href: '#how-it-works', label: 'How it works' },
+    { href: '#why-ferro-maps', label: 'Why Ferro Maps' },
+    { href: '#available-vehicles', label: 'Available vehicles' },
+    { href: '#contact', label: 'Contact' },
+  ]
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-border-default font-geist transition-transform duration-base ${
@@ -25,27 +34,49 @@ export default function Header() {
     >
       <div className="flex items-center justify-between px-8 py-4">
         <img src={logo} alt="Ferro Maps" className="h-[56px] w-auto" />
-        <nav className="flex gap-6 text-label font-medium text-text-secondary">
-          <a href="#how-it-works" className="hover:text-ferro-primary transition-colors duration-base">
-            How it works
-          </a>
-          <a href="#why-ferro-maps" className="hover:text-ferro-primary transition-colors duration-base">
-            Why Ferro Maps
-          </a>
-          <a href="#available-vehicles" className="hover:text-ferro-primary transition-colors duration-base">
-            Available vehicles
-          </a>
-          <a href="#contact" className="hover:text-ferro-primary transition-colors duration-base">
-            Contact
-          </a>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex gap-6 text-label font-medium text-text-secondary">
+          {navLinks.map(({ href, label }) => (
+            <a key={href} href={href} className="hover:text-ferro-primary transition-colors duration-base">
+              {label}
+            </a>
+          ))}
         </nav>
-        <a
-          href="#get-started"
-          className="bg-ferro-primary text-white rounded-button px-6 py-2 text-label font-semibold hover:bg-action-primary-hover transition-colors duration-base"
-        >
-          Get Started
-        </a>
+
+        <div className="flex items-center gap-3">
+          <a
+            href="#get-started"
+            className="bg-ferro-primary text-white rounded-button px-6 py-2 text-label font-semibold hover:bg-action-primary-hover transition-colors duration-base"
+          >
+            Get Started
+          </a>
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden p-1 text-text-secondary hover:text-ferro-primary transition-colors duration-base"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation"
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile dropdown nav */}
+      {menuOpen && (
+        <nav className="md:hidden border-t border-border-default bg-white px-8 py-4 flex flex-col gap-4 text-label font-medium text-text-secondary">
+          {navLinks.map(({ href, label }) => (
+            <a
+              key={href}
+              href={href}
+              className="hover:text-ferro-primary transition-colors duration-base"
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      )}
     </header>
   )
 }
