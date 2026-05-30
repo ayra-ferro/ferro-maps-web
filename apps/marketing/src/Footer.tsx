@@ -2,8 +2,8 @@ import logo from './assets/ferro-logo.png'
 
 export default function Footer() {
   return (
-    <footer className="bg-ferro-ink text-white font-geist px-8 py-12">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
+    <footer className="bg-ferro-ink text-white font-geist py-12">
+      <div className="px-8 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <img src={logo} alt="Ferro Maps" className="h-[44px] w-auto" />
           <nav className="flex flex-wrap gap-6 text-label font-medium text-neutral-300">
