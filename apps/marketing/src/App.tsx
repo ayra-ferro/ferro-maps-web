@@ -1,6 +1,7 @@
 import Header from './Header'
 import Hero from './Hero'
 import WhyFerroMaps from './WhyFerroMaps'
+import AppScreenshots from './AppScreenshots'
 import Footer from './Footer'
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
 
       <main>
         <WhyFerroMaps />
+        <AppScreenshots />
       </main>
 
       <Footer />
