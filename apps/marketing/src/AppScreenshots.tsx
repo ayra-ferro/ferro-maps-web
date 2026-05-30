@@ -28,7 +28,7 @@ function PhoneMockup({ label, isCenter }: { label: string; isCenter: boolean }) 
 
 export default function AppScreenshots() {
   return (
-    <section className="bg-white py-28">
+    <section className="bg-white pt-28 pb-12">
       <div className="max-w-7xl mx-auto px-8">
         <h2 className="text-headline font-bold text-text-primary text-center mb-16">
           See it in action
