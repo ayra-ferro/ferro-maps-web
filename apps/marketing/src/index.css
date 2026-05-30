@@ -10,6 +10,34 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface-canvas: #FFFFFF;
+  --surface-raised: #F7F9FC;
+  --surface-overlay: #FFFFFF;
+  --surface-sunken: #EEF2F8;
+  --surface-inverse: #0F1626;
+  --surface-brand-subtle: #E8F1FF;
+  --surface-brand: #1E7BFF;
+  --text-primary: #0F1626;
+  --text-secondary: #3A4358;
+  --text-tertiary: #6B7892;
+  --text-disabled: #C2CDDC;
+  --text-inverse: #FFFFFF;
+  --text-brand: #1E7BFF;
+  --text-on-brand: #FFFFFF;
+  --border-subtle: #EEF2F8;
+  --border-default: #DDE4EF;
+  --border-strong: #C2CDDC;
+  --border-brand: #1E7BFF;
+  --action-primary: #1E7BFF;
+  --action-primary-hover: #0A4FCC;
+  --action-primary-pressed: #0A4FCC;
+  --action-primary-disabled: #C2CDDC;
+  --action-secondary: #E8F1FF;
+  --action-secondary-hover: #D6E5FF;
+  --action-ghost-hover: #EEF2F8;
+}
+
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
