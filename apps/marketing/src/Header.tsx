@@ -22,6 +22,7 @@ export default function Header() {
   const navLinks = [
     { href: '#how-it-works', label: 'How it works' },
     { href: '#why-ferro-maps', label: 'Why Ferro Maps' },
+    { href: '#gallery', label: 'Gallery' },
     { href: '#contact', label: 'Contact' },
   ]
 
@@ -45,7 +46,7 @@ export default function Header() {
 
         <div className="flex items-center gap-3">
           <a
-            href="#get-started"
+            href="#download"
             className="bg-ferro-primary text-white rounded-button px-6 py-2 text-label font-semibold hover:bg-action-primary-hover transition-colors duration-base"
           >
             Get Started
