@@ -1,6 +1,6 @@
 export default function DownloadBanner() {
   return (
-    <section className="py-12 px-8">
+    <section id="download" className="py-12 px-8">
       <div className="max-w-5xl mx-auto bg-ferro-tint border-2 border-ferro-primary rounded-2xl shadow-md px-10 py-12 flex flex-col lg:flex-row items-center justify-between gap-10">
         <div className="flex flex-col items-center lg:items-start gap-3 text-center lg:text-left">
           <h2 className="text-3xl font-bold leading-tight text-ferro-ink">Start earning smarter today</h2>
