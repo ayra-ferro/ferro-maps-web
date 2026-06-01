@@ -33,7 +33,7 @@ export default function Header() {
       }`}
     >
       <div className="flex items-center justify-between px-8 py-4">
-        <img src={logo} alt="Ferro Maps" className="h-[56px] w-auto" />
+        <img src={logo} alt="Ferro Maps" className="h-[44px] w-auto rounded-xl" />
 
         {/* Desktop nav */}
         <nav className="hidden md:flex gap-6 text-label font-medium text-text-secondary">
