@@ -13,9 +13,6 @@ export default function Footer() {
             <a href="#why-ferro-maps" className="hover:text-white transition-colors duration-base">
               Why Ferro Maps
             </a>
-            <a href="#available-vehicles" className="hover:text-white transition-colors duration-base">
-              Available vehicles
-            </a>
             <a href="#contact" className="hover:text-white transition-colors duration-base">
               Contact
             </a>
