@@ -22,7 +22,6 @@ export default function Header() {
   const navLinks = [
     { href: '#how-it-works', label: 'How it works' },
     { href: '#why-ferro-maps', label: 'Why Ferro Maps' },
-    { href: '#available-vehicles', label: 'Available vehicles' },
     { href: '#contact', label: 'Contact' },
   ]
 
