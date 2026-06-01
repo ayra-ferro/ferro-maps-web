@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-ferro-ink text-white font-geist py-12">
       <div className="px-8 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <img src={logo} alt="Ferro Maps" className="h-[44px] w-auto" />
+          <img src={logo} alt="Ferro Maps" className="h-[44px] w-auto rounded-xl" />
           <nav className="flex flex-wrap gap-6 text-label font-medium text-neutral-300">
             <a href="#how-it-works" className="hover:text-white transition-colors duration-base">
               How it works
