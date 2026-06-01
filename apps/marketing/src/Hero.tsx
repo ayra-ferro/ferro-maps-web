@@ -33,7 +33,7 @@ export default function Hero() {
 
           <div className="flex flex-wrap gap-4 mt-2 animate-fade-in" style={{ animationDelay: '320ms' }}>
             <a
-              href="#get-started"
+              href="#download"
               className="inline-block bg-ferro-primary hover:bg-action-primary-hover text-white font-semibold px-8 py-3 rounded-button transition-colors duration-base"
             >
               Get Started
