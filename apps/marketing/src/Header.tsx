@@ -28,7 +28,12 @@ export default function Header() {
   }, [])
 
   return (
-    <header
+    <>
+      <div
+        className="fixed top-0 left-0 right-0 z-[51] h-5 bg-transparent"
+        onMouseEnter={() => setVisible(true)}
+      />
+      <header
       className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-border-default transition-transform duration-slow ease-standard ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
@@ -62,5 +67,6 @@ export default function Header() {
         </button>
       </div>
     </header>
+    </>
   )
 }
