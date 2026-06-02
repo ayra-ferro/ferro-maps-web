@@ -1,37 +1,131 @@
-import logo from './assets/ferro-logo.png'
+import { Play } from 'lucide-react'
+
+const AppleIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+  </svg>
+)
+
+const scrollTo = (id: string) =>
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+const overline =
+  'text-[11px] font-semibold text-neutral-500 tracking-widest uppercase'
+
+const navLink =
+  'text-[12px] text-neutral-300 hover:font-bold hover:text-white transition-all duration-fast cursor-pointer'
 
 export default function Footer() {
+  const storeBtn =
+    'flex items-center gap-2 bg-black border border-neutral-700 rounded-md px-2 py-1 text-white hover:-translate-y-0.5 transition-all duration-fast'
+
   return (
-    <footer className="bg-ferro-ink text-white font-geist py-12">
-      <div className="px-8 flex flex-col gap-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <img src={logo} alt="Ferro Maps" className="h-[44px] w-auto rounded-xl" />
-          <nav className="flex flex-wrap gap-6 text-label font-medium text-neutral-300">
-            <a href="#how-it-works" className="hover:text-white transition-colors duration-base">
-              How it works
-            </a>
-            <a href="#why-ferro-maps" className="hover:text-white transition-colors duration-base">
-              Why Ferro Maps
-            </a>
-            <a href="#gallery" className="hover:text-white transition-colors duration-base">
-              Gallery
-            </a>
-            <a href="#contact" className="hover:text-white transition-colors duration-base">
-              Contact
-            </a>
-            <a href="#privacy-policy" className="hover:text-white transition-colors duration-base">
-              Privacy Policy
-            </a>
-            <a href="#terms" className="hover:text-white transition-colors duration-base">
-              Terms
-            </a>
-          </nav>
+    <footer className="bg-surface-inverse text-white py-12 px-6">
+      <div className="grid grid-cols-4 gap-20 max-w-6xl mx-auto px-10">
+
+        <div>
+          <p className={`${overline} mb-5`}>PRODUCT</p>
+          <ul className="flex flex-col gap-3">
+            {[
+              { label: 'Why Ferro Maps', id: 'why-ferro-maps' },
+              { label: 'How it works', id: 'how-it-works' },
+              { label: 'Testimonials', id: 'driver-stories' },
+            ].map(({ label, id }) => (
+              <li key={id}>
+                <span className={navLink} onClick={() => scrollTo(id)}>
+                  {label}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="border-t border-neutral-700 pt-8 flex flex-col gap-2">
-          <p className="text-body-sm text-neutral-300">© 2026 Ferro Maps Ltd. All rights reserved.</p>
-          <p className="text-caption text-neutral-300">
-            Ferro Maps Ltd is registered with the UK Information Commissioner's Office under the Data Protection Act 2018.
-          </p>
+
+        <div>
+          <p className={`${overline} mb-5`}>COMPANY</p>
+          <ul className="flex flex-col gap-3">
+            <li>
+              <span className={navLink} onClick={() => scrollTo('contact')}>
+                Contact
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className={`${overline} mb-5`}>LEGAL</p>
+          <ul className="flex flex-col gap-3">
+            {['Privacy Policy', 'Terms & Conditions', 'Cookies'].map((label) => (
+              <li key={label}>
+                <a href="#" className={navLink.replace('cursor-pointer', '')}>
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="-ml-10">
+          <p className={`${overline} mb-5`}>DOWNLOAD THE APP</p>
+
+          <div className="flex gap-2 mb-7">
+            <a
+              href="https://apps.apple.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={storeBtn}
+            >
+              <AppleIcon />
+              <div className="flex flex-col leading-none">
+                <span className="text-[6px] text-neutral-300">Download on the</span>
+                <span className="text-[12px] font-bold whitespace-nowrap">App Store</span>
+              </div>
+            </a>
+
+            <a
+              href="https://play.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={storeBtn}
+            >
+              <Play size={14} />
+              <div className="flex flex-col leading-none">
+                <span className="text-[6px] text-neutral-300">GET IT ON</span>
+                <span className="text-[12px] font-bold whitespace-nowrap">Google Play</span>
+              </div>
+            </a>
+          </div>
+
+          <p className={`${overline} mb-4`}>JOIN US</p>
+
+          <div className="flex gap-4">
+            <a href="#" target="_blank" rel="noreferrer" aria-label="Instagram" className="text-neutral-300 hover:text-white">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+              </svg>
+            </a>
+
+            <a href="#" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="text-neutral-300 hover:text-white">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect width="4" height="12" x="2" y="9" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-neutral-700 mt-10 pt-5 max-w-6xl mx-auto px-10 flex justify-between items-center">
+        <p className="text-[11px] text-neutral-500">
+          Ferro Maps @ 2026. All rights reserved.
+        </p>
+
+        <div className="flex gap-6">
+          <span className="text-[11px] text-neutral-500">All systems operational</span>
+          <span className="text-[11px] text-neutral-500">London, United Kingdom</span>
+          <span className="text-[11px] text-neutral-500">Made for drivers</span>
         </div>
       </div>
     </footer>
