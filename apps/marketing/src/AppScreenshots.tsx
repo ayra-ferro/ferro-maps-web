@@ -1,69 +1,70 @@
-import { MapPin } from 'lucide-react'
-
-const phones = [
-  { label: 'Map View' },
-  { label: 'Explore Opportunities' },
-  { label: 'Your Profile' },
-]
-
-function PhoneMockup({ label, isCenter }: { label: string; isCenter: boolean }) {
+function PhoneSVG({ clipId }: { clipId: string }) {
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div
-        className={`relative bg-ferro-tint rounded-2xl ${
-          isCenter
-            ? 'w-64 h-[480px] shadow-elevation-3'
-            : 'w-52 h-[400px] shadow-elevation-2'
-        }`}
-      >
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <MapPin size={isCenter ? 48 : 40} className="text-ferro-primary" />
-          <p className="text-caption text-text-tertiary">Screenshot coming soon</p>
-        </div>
-      </div>
-      <span className="text-body-sm font-medium text-text-secondary">{label}</span>
-    </div>
+    <svg
+      width="280"
+      height="560"
+      viewBox="0 0 280 560"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <clipPath id={clipId}>
+          <rect x="4" y="4" width="272" height="552" rx="38" ry="38" />
+        </clipPath>
+      </defs>
+      {/* Outer phone shell */}
+      <rect
+        x="2"
+        y="2"
+        width="276"
+        height="556"
+        rx="40"
+        ry="40"
+        fill="white"
+        stroke="#0F1626"
+        strokeWidth="4"
+      />
+      {/* Dynamic island pill */}
+      <rect x="100" y="16" width="80" height="26" rx="13" fill="#0F1626" />
+      {/* Decorative screen ellipses — clipped to phone screen */}
+      <g clipPath={`url(#${clipId})`}>
+        <ellipse cx="105" cy="330" rx="128" ry="108" fill="#EEF2F8" />
+        <ellipse cx="178" cy="248" rx="108" ry="138" fill="#DDE4EF" />
+      </g>
+    </svg>
   )
 }
 
+const phones = [
+  { label: 'Map View', clipId: 'screen-clip-1' },
+  { label: 'Explore Opportunities', clipId: 'screen-clip-2' },
+  { label: 'Profile', clipId: 'screen-clip-3' },
+]
+
 export default function AppScreenshots() {
   return (
-    <section id="gallery" className="bg-white pt-28 pb-12">
-      <div className="max-w-7xl mx-auto px-8">
-        <h2 className="text-headline font-bold text-text-primary text-center mb-16">
-          See it in action
+    <section id="app-screenshots" className="bg-[#DDEEFF] py-24 px-6">
+      {/* Header */}
+      <div className="text-center">
+        <p className="text-ferro-primary text-overline font-semibold tracking-widest uppercase mb-4">
+          SEE IT IN ACTION
+        </p>
+        <h2 className="font-bold text-headline text-neutral-900 mb-3">
+          Built for the way drivers work
         </h2>
+        <p className="font-bold text-subtitle text-neutral-700 mb-16">
+          Three screens. Everything you need to start your shift smarter.
+        </p>
+      </div>
 
-        {/* Desktop: three overlapping phones, centre phone raised */}
-        <div className="hidden md:flex items-end justify-center">
-          <div className="relative z-0 translate-x-8">
-            <PhoneMockup label="Map View" isCenter={false} />
+      {/* Three phones */}
+      <div className="flex justify-center gap-12 items-end">
+        {phones.map(({ label, clipId }) => (
+          <div key={label} className="flex flex-col items-center gap-4">
+            <span className="text-label font-medium text-neutral-700">{label}</span>
+            <PhoneSVG clipId={clipId} />
           </div>
-          <div className="relative z-10">
-            <PhoneMockup label="Explore Opportunities" isCenter={true} />
-          </div>
-          <div className="relative z-0 -translate-x-8">
-            <PhoneMockup label="Your Profile" isCenter={false} />
-          </div>
-        </div>
-
-        {/* Mobile: snap-scroll carousel, one phone visible at a time */}
-        <div className="md:hidden -mx-8 overflow-x-auto snap-x snap-mandatory flex pb-6">
-          {phones.map(({ label }) => (
-            <div
-              key={label}
-              className="snap-center shrink-0 w-[100vw] flex flex-col items-center gap-4 px-8"
-            >
-              <div className="relative w-64 h-[440px] bg-ferro-tint rounded-2xl shadow-elevation-2">
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                  <MapPin size={40} className="text-ferro-primary" />
-                  <p className="text-caption text-text-tertiary">Screenshot coming soon</p>
-                </div>
-              </div>
-              <span className="text-body-sm font-medium text-text-secondary">{label}</span>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </section>
   )
