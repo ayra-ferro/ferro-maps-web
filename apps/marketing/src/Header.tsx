@@ -38,7 +38,7 @@ export default function Header() {
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-16 py-4 flex items-center justify-between">
         <span className="font-bold text-ferro-primary font-geist text-subtitle">
           Ferro Maps
         </span>
