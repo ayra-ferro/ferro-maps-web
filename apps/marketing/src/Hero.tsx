@@ -1,59 +1,83 @@
-import { useState, useEffect } from 'react'
-import { MapPin } from 'lucide-react'
-
 export default function Hero() {
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 50)
-    return () => clearTimeout(timer)
-  }, [])
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
-    <section
-      className={`bg-white flex items-center pt-[88px] transition-opacity duration-deliberate ${
-        visible ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
-      <div className="w-full max-w-7xl mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        {/* Left — text content */}
-        <div className="flex flex-col gap-6">
-          <span className="self-start px-4 py-1.5 rounded-full bg-ferro-tint text-ferro-primary text-label font-medium animate-fade-up">
-            Navigation for Income
-          </span>
+    <section id="hero" className="w-full bg-white min-h-screen flex items-center">
+      <div className="w-full max-w-7xl mx-auto px-16 py-24 grid grid-cols-2 gap-16 items-center">
 
-          <h1 className="text-display font-extrabold text-text-primary animate-fade-up" style={{ animationDelay: '80ms' }}>
-            Know where demand is highest.{' '}
-            <span className="block text-ferro-primary">Before you drive there.</span>
+        {/* Left column */}
+        <div>
+          <h1 className="font-extrabold text-display text-neutral-900 font-geist">
+            Navigation for
+            <br />
+            <span className="text-ferro-primary">Income.</span>
           </h1>
 
-          <p className="text-subtitle text-text-secondary max-w-md animate-fade-up" style={{ animationDelay: '160ms' }}>
-            Ferro Maps tells gig economy drivers where demand is highest - so every shift starts in the right place.
+          <p className="text-body-lg text-neutral-700 mt-6 max-w-md">
+            Know where demand is highest before you drive there. Position smarter. Earn more.
           </p>
 
-          <div className="flex flex-wrap gap-4 mt-2 animate-fade-in" style={{ animationDelay: '320ms' }}>
-            <a
-              href="#download"
-              className="inline-block bg-ferro-primary hover:bg-action-primary-hover text-white font-semibold px-8 py-3 rounded-button transition-colors duration-base"
+          <div className="mt-10 flex gap-4">
+            <button
+              onClick={() => scrollTo('download')}
+              className="bg-ferro-primary text-white rounded-md px-6 py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast"
             >
               Get Started
-            </a>
-            <a
-              href="#how-it-works"
-              className="inline-block border border-ferro-primary text-ferro-primary font-semibold px-8 py-3 rounded-button hover:bg-ferro-tint transition-colors duration-base"
+            </button>
+            <button
+              onClick={() => scrollTo('how-it-works')}
+              className="border border-ferro-primary text-ferro-primary bg-white rounded-md px-6 py-3 font-semibold hover:bg-ferro-tint transition-colors duration-fast"
             >
-              How it works
-            </a>
+              How It Works
+            </button>
           </div>
         </div>
 
-        {/* Right — phone mockup placeholder */}
-        <div className="flex items-center justify-center animate-fade-up-far" style={{ animationDelay: '160ms' }}>
-          <div className="w-72 h-[520px] rounded-2xl bg-ferro-tint flex flex-col items-center justify-center gap-4">
-            <MapPin size={48} className="text-ferro-primary" />
-            <p className="text-label text-text-tertiary">App screenshot coming soon</p>
-          </div>
+        {/* Right column — iPhone 14 Pro style phone wireframe */}
+        <div className="flex justify-center items-center">
+          <svg
+            width="280"
+            height="510"
+            viewBox="0 0 280 560"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <clipPath id="screen-clip">
+                <rect x="4" y="4" width="272" height="552" rx="38" ry="38" />
+              </clipPath>
+            </defs>
+            {/* Outer phone shell */}
+            <rect
+              x="2"
+              y="2"
+              width="276"
+              height="556"
+              rx="40"
+              ry="40"
+              fill="white"
+              stroke="#0F1626"
+              strokeWidth="4"
+            />
+            {/* Dynamic island pill */}
+            <rect
+              x="100"
+              y="16"
+              width="80"
+              height="26"
+              rx="13"
+              fill="#0F1626"
+            />
+            {/* Decorative screen ellipses — clipped to phone screen */}
+            <g clipPath="url(#screen-clip)">
+              <ellipse cx="105" cy="330" rx="128" ry="108" fill="#EEF2F8" />
+              <ellipse cx="178" cy="248" rx="108" ry="138" fill="#DDE4EF" />
+            </g>
+          </svg>
         </div>
+
       </div>
     </section>
   )
