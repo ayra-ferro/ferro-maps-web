@@ -1,52 +1,61 @@
-import { MapPin } from 'lucide-react'
-
 const steps = [
   {
-    number: '1',
-    title: 'Download the app',
-    copy: 'Download Ferro Maps and create your account in under 60 seconds using your phone number.',
+    label: 'Step 1',
+    body: 'Download Ferro Maps and create your account in under 60 seconds using your phone number or your email.',
   },
   {
-    number: '2',
-    title: 'See live demand',
-    copy: 'Open the map at the start of your shift. See live demand hotspots near you colour-coded by tier — Good, Great and Flawless.',
+    label: 'Step 2',
+    body: 'Open the map at the start of your shift. See live demand hotspots near you colour-coded by Good, Great and Flawless opportunity tiers.',
   },
   {
-    number: '3',
-    title: 'Earn and maximise',
-    copy: 'Drive to a Flawless opportunity, collect Ferro points and maximise your earnings. The app tells you exactly how long the window lasts.',
+    label: 'Step 3',
+    body: 'Drive to an opportunity, collect Ferro points and maximise your earnings. The app tells you exactly how long the window lasts.',
   },
 ]
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-white py-28">
-      <div className="max-w-4xl mx-auto px-8">
-        <h2 className="text-headline font-bold text-text-primary text-center mb-16">
+    <section id="how-it-works" className="bg-surface-raised py-24 px-6">
+      {/* Header */}
+      <div className="text-center mb-16">
+        <p className="text-ferro-primary text-overline font-semibold tracking-widest uppercase mb-4">
+          HOW IT WORKS
+        </p>
+        <h2 className="font-bold text-headline text-neutral-900 mb-3">
           Get started in 3 steps
         </h2>
+        <p className="font-bold text-subtitle text-neutral-900">
+          From download to your first opportunity in under five minutes
+        </p>
+      </div>
 
-        <div className="relative flex flex-col gap-16">
-          {/* Vertical connecting line — desktop only */}
-          <div className="absolute hidden md:block left-1/2 -translate-x-1/2 top-8 bottom-8 w-px bg-neutral-200" />
-
-          {steps.map(({ number, title, copy }) => (
-            <div key={number} className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-              {/* Left: placeholder image */}
-              <div className="rounded-2xl bg-white aspect-video flex flex-col items-center justify-center gap-3">
-                <MapPin size={32} className="text-ferro-primary" />
-                <span className="text-body-sm text-text-tertiary">Screenshot coming soon</span>
-              </div>
-
-              {/* Right: copy */}
-              <div className="flex flex-col gap-3">
-                <span className="text-[64px] font-extrabold leading-none text-neutral-200">{number}</span>
-                <h3 className="text-title font-bold text-text-primary">{title}</h3>
-                <p className="text-body text-text-secondary">{copy}</p>
-              </div>
+      {/* Three columns */}
+      <div className="grid grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {steps.map(({ label, body }) => (
+          <div key={label} className="flex flex-col gap-4">
+            {/* Block A — image placeholder */}
+            <div className="bg-neutral-200 rounded-card h-48 w-full flex items-center justify-center">
+              <svg
+                width="64"
+                height="48"
+                viewBox="0 0 64 48"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <rect x="1" y="1" width="62" height="46" rx="2" stroke="#9CA3AF" strokeWidth="2" />
+                <line x1="1" y1="1" x2="63" y2="47" stroke="#9CA3AF" strokeWidth="2" />
+                <line x1="63" y1="1" x2="1" y2="47" stroke="#9CA3AF" strokeWidth="2" />
+              </svg>
             </div>
-          ))}
-        </div>
+
+            {/* Block B — step text card */}
+            <div className="bg-white rounded-card p-6 shadow-elevation-1">
+              <h3 className="font-bold text-title text-neutral-900 mb-3">{label}</h3>
+              <p className="text-body text-neutral-700">{body}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )
