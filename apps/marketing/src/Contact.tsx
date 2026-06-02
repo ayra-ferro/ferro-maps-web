@@ -12,7 +12,7 @@ const faqs = [
 ]
 
 const inputClass =
-  'bg-white border border-border-default rounded-md px-4 py-2 text-body focus:ring-2 focus:ring-ferro-primary outline-none w-full'
+  'bg-white border border-border-default rounded-md px-4 py-2 text-[12px] focus:ring-2 focus:ring-ferro-primary outline-none w-full'
 
 export default function Contact() {
   const [name, setName] = useState('')
@@ -22,13 +22,14 @@ export default function Contact() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(false)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(3)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setSuccess(false)
     setError(false)
+
     try {
       await addDoc(collection(db, 'supportRequests'), {
         name,
@@ -37,6 +38,7 @@ export default function Contact() {
         agreedToPolicy: agreed,
         submittedAt: serverTimestamp(),
       })
+
       setSuccess(true)
       setName('')
       setEmail('')
@@ -50,73 +52,92 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="bg-white py-24 px-6">
-      <div className="text-center mb-12">
-        <p className="text-ferro-primary text-overline font-semibold tracking-widest uppercase mb-4">
+    <section id="contact" className="bg-white py-12 px-6">
+      <div className="text-center mb-8">
+        <p className="text-ferro-primary text-[11px] font-semibold tracking-widest uppercase mb-3">
           CONTACT
         </p>
-        <h2 className="font-bold text-headline text-neutral-900 mb-3">
+
+        <h2 className="font-bold text-[30px] leading-tight text-neutral-900 mb-2">
           Got questions? We'll answer fast
         </h2>
-        <p className="font-bold text-subtitle text-neutral-700 mb-12">
+
+        <p className="font-bold text-[20px] leading-tight text-neutral-700">
           Most drivers find what they need below. If not, drop us a line.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-16 max-w-7xl mx-auto px-16 items-start">
+      <div className="grid grid-cols-2 gap-3 max-w-6xl mx-auto px-10 items-stretch">
+
         {/* LEFT — Contact form */}
-        <div className="bg-surface-brand-subtle rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="bg-ferro-primary text-white rounded-full px-4 py-1 text-label font-semibold">Form</span>
-            <span className="text-body text-neutral-700">support@ferromaps.com</span>
+        <div className="bg-surface-brand-subtle rounded-lg p-6 h-full">
+          <div className="flex items-center gap-3 mb-5">
+            <span className="bg-ferro-primary text-white rounded-full px-5 py-1.5 text-[11px] font-semibold">
+              Form
+            </span>
+
+            <span className="text-[11px] font-semibold text-neutral-900">
+              support@ferromaps.com
+            </span>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col">
-                <label className="text-body-sm font-medium text-neutral-700 mb-1 block">Name</label>
+                <label className="text-[11px] font-bold text-neutral-900 mb-2">
+                  Name
+                </label>
+
                 <input
                   type="text"
                   placeholder="Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={inputClass}
+                  className={`${inputClass} h-[38px]`}
                   required
                 />
               </div>
+
               <div className="flex flex-col">
-                <label className="text-body-sm font-medium text-neutral-700 mb-1 block">Email</label>
+                <label className="text-[11px] font-bold text-neutral-900 mb-2">
+                  Email
+                </label>
+
                 <input
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={inputClass}
+                  className={`${inputClass} h-[38px]`}
                   required
                 />
               </div>
             </div>
 
             <div className="flex flex-col">
-              <label className="text-body-sm font-medium text-neutral-700 mb-1 block">Your message</label>
+              <label className="text-[11px] font-bold text-neutral-900 mb-2">
+                Your message
+              </label>
+
               <textarea
                 placeholder="Tell us as much as you can."
-              rows={5}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className={`${inputClass} resize-none`}
-              required
-            />
+                rows={5}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className={`${inputClass} resize-none h-[120px]`}
+                required
+              />
             </div>
 
-            <label className="flex items-center gap-2 cursor-pointer text-body text-neutral-700">
+            <label className="flex items-center gap-2 cursor-pointer text-[11px] text-neutral-700">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
                 required
-                className="w-4 h-4 accent-ferro-primary"
+                className="w-3 h-3 accent-ferro-primary"
               />
+
               <span>
                 I agree to the{' '}
                 <a href="#" className="font-bold text-neutral-900 no-underline">
@@ -128,18 +149,19 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-ferro-primary text-white rounded-md py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast disabled:opacity-50"
+              className="w-full bg-ferro-primary text-white rounded-md py-3 text-[12px] hover:bg-ferro-deep transition-colors duration-fast disabled:opacity-50"
             >
               {loading ? 'Sending…' : 'Submit'}
             </button>
 
             {success && (
-              <p className="text-body text-color-success font-medium">
+              <p className="text-[12px] text-color-success font-medium">
                 Message sent! We'll be in touch soon.
               </p>
             )}
+
             {error && (
-              <p className="text-body text-color-danger font-medium">
+              <p className="text-[12px] text-color-danger font-medium">
                 Something went wrong. Please try support@ferromaps.com
               </p>
             )}
@@ -147,27 +169,39 @@ export default function Contact() {
         </div>
 
         {/* RIGHT — FAQ accordion */}
-        <div className="self-start">
-          <h3 className="font-semibold text-subtitle text-neutral-900 mb-4">
+        <div className="h-full flex flex-col">
+          <h3 className="font-bold text-[13px] text-neutral-900 mb-3">
             Frequently Asked Questions
           </h3>
 
           {faqs.map((faq, i) => {
             const isOpen = openFaq === i
+
             return (
               <div
                 key={i}
-                className={`border border-border-default rounded-xl px-4 py-4 mb-3 cursor-pointer ${isOpen ? 'bg-surface-brand-subtle' : 'bg-white'}`}
+                className={`border border-border-default rounded-lg px-4 py-4 mb-3 cursor-pointer shadow-sm flex-shrink-0 ${
+                  isOpen ? 'bg-surface-brand-subtle' : 'bg-white'
+                }`}
                 onClick={() => setOpenFaq(isOpen ? null : i)}
               >
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-body text-neutral-900">{faq.q}</span>
-                  <div className="w-7 h-7 rounded-full border-2 border-ferro-primary flex items-center justify-center flex-shrink-0">
-                    <ChevronDown size={14} className={`text-ferro-primary transition-transform duration-fast ${isOpen ? 'rotate-180' : ''}`} />
+                  <span className="font-bold text-[12px] text-neutral-900">
+                    {faq.q}
+                  </span>
+
+                  <div className="w-5 h-5 rounded-full border-2 border-ferro-primary flex items-center justify-center flex-shrink-0">
+                    <ChevronDown
+                      size={12}
+                      className={`text-ferro-primary transition-transform duration-fast ${
+                        isOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </div>
                 </div>
+
                 {isOpen && (
-                  <p className="text-body text-neutral-700 mt-3 pt-3 border-t border-border-subtle">
+                  <p className="text-[11px] text-neutral-700 mt-3">
                     {faq.a}
                   </p>
                 )}
@@ -175,6 +209,7 @@ export default function Contact() {
             )
           })}
         </div>
+
       </div>
     </section>
   )
