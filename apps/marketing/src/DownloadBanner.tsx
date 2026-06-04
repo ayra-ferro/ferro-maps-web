@@ -17,44 +17,36 @@ function AppleIcon() {
 
 export default function DownloadBanner() {
   const btnBase =
-    'inline-flex items-center gap-2 bg-black text-white rounded-md px-3 py-1.5'
+    'flex items-center justify-center gap-2 bg-black text-white rounded-md px-4 py-2 w-full md:w-auto md:inline-flex'
 
   return (
     <section
       id="download"
-      className="bg-ferro-primary h-[350px] overflow-hidden"
+      className="bg-ferro-primary overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-16 h-full flex items-center">
+      <div className="relative max-w-7xl mx-auto px-6 md:px-16 py-8 md:py-0 md:h-[350px] flex flex-col md:flex-row md:items-center">
 
-        {/* LEFT SIDE - BIRD */}
-        <div className="flex-1 h-full relative overflow-hidden">
+        {/* Bird — lg and above only, sits at bottom-left of banner */}
+        <div className="hidden lg:block absolute bottom-0 left-0 -ml-1 h-96 w-[47%] overflow-hidden">
           <img
             src="/ferro-bird.png"
             alt="Ferro Maps mascot"
-            className="
-              absolute
-              left-[-120px]
-              top-[-75px]
-              h-[650px]
-              w-auto
-              max-w-none
-            "
+            className="h-full w-full object-cover object-top"
           />
         </div>
 
-        {/* RIGHT SIDE - CONTENT */}
-        <div className="w-[55%] relative z-10 pl-0 min-w-[520px]">
-
-          <h2 className="text-white font-bold text-[42px] leading-tight">
+        {/* Content — pushed right to clear the bird */}
+        <div className="w-full lg:w-[60%] relative z-10 lg:ml-auto">
+          <h2 className="text-white font-bold text-[32px] md:text-[42px] leading-tight">
             Start earning smarter{' '}
             <span className="text-ferro-signal">today.</span>
           </h2>
 
-          <p className="text-black text-[20px] font-medium leading-tight mt-5 mb-6 w-full">
+          <p className="text-black text-[18px] md:text-[20px] font-medium leading-tight mt-5 mb-6 w-full">
             Join Ferro Maps and know where demand is highest before you drive there.
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             <a
               href="https://apps.apple.com"
               target="_blank"
@@ -62,15 +54,9 @@ export default function DownloadBanner() {
               className={btnBase}
             >
               <AppleIcon />
-
               <div className="flex flex-col leading-none">
-                <span className="text-[7px] text-neutral-300">
-                  Download on the
-                </span>
-
-                <span className="text-[14px] font-semibold">
-                  App Store
-                </span>
+                <span className="text-[7px] text-neutral-300">Download on the</span>
+                <span className="text-[14px] font-semibold">App Store</span>
               </div>
             </a>
 
@@ -81,19 +67,12 @@ export default function DownloadBanner() {
               className={btnBase}
             >
               <Play size={16} />
-
               <div className="flex flex-col leading-none">
-                <span className="text-[7px] text-neutral-300">
-                  GET IT ON
-                </span>
-
-                <span className="text-[14px] font-semibold">
-                  Google Play
-                </span>
+                <span className="text-[7px] text-neutral-300">GET IT ON</span>
+                <span className="text-[14px] font-semibold">Google Play</span>
               </div>
             </a>
           </div>
-
         </div>
 
       </div>
