@@ -4,8 +4,8 @@ export default function Hero() {
   }
 
   return (
-    <section id="hero" className="w-full bg-white min-h-screen flex items-center">
-      <div className="w-full max-w-7xl mx-auto px-16 py-24 grid grid-cols-2 gap-16 items-center">
+    <section id="hero" className="w-full bg-white min-h-screen flex items-center pt-10">
+      <div className="w-full max-w-7xl mx-auto px-6 md:px-16 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
 
         {/* Left column */}
         <div>
@@ -22,13 +22,13 @@ export default function Hero() {
           <div className="mt-10 flex gap-4">
             <button
               onClick={() => scrollTo('download')}
-              className="bg-ferro-primary text-white rounded-md px-6 py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast"
+              className="bg-ferro-primary text-white rounded-lg px-6 py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast"
             >
               Get Started
             </button>
             <button
               onClick={() => scrollTo('how-it-works')}
-              className="border border-ferro-primary text-ferro-primary bg-white rounded-md px-6 py-3 font-semibold hover:bg-ferro-tint transition-colors duration-fast"
+              className="border border-ferro-primary text-ferro-primary bg-white rounded-lg px-6 py-3 font-semibold hover:bg-ferro-tint transition-colors duration-fast"
             >
               How It Works
             </button>
@@ -36,13 +36,12 @@ export default function Hero() {
         </div>
 
         {/* Right column — iPhone 14 Pro style phone wireframe */}
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-full">
           <svg
-            width="280"
-            height="510"
             viewBox="0 0 280 560"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="w-full max-w-[280px] h-auto"
           >
             <defs>
               <clipPath id="screen-clip">
