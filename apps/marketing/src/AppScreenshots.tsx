@@ -57,10 +57,13 @@ export default function AppScreenshots() {
         </p>
       </div>
 
-      {/* Three phones */}
-      <div className="flex justify-center gap-12 items-end">
+      {/* Three phones — snap-scroll carousel below lg, side-by-side at lg+ */}
+      <div
+        className="flex items-end gap-8 lg:gap-12 lg:justify-center overflow-x-auto lg:overflow-x-hidden snap-x snap-mandatory lg:snap-none -mx-6 px-6 lg:mx-0 lg:px-0 pb-4 lg:pb-0"
+        style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+      >
         {phones.map(({ label, clipId }) => (
-          <div key={label} className="flex flex-col items-center gap-4">
+          <div key={label} className="flex flex-col items-center gap-4 snap-center shrink-0">
             <span className="text-label font-medium text-neutral-700">{label}</span>
             <PhoneSVG clipId={clipId} />
           </div>
