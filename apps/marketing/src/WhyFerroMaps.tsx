@@ -36,11 +36,11 @@ export default function WhyFerroMaps() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
         {cards.map(({ icon: Icon, title, body, tag }) => (
           <div
             key={title}
-            className="bg-white rounded-card p-8 flex flex-col gap-6 shadow-elevation-2"
+            className="bg-white rounded-card p-8 flex flex-col gap-6 shadow-elevation-2 h-full"
           >
             <div className="w-14 h-14 rounded-full bg-ferro-primary flex items-center justify-center text-white shrink-0">
               <Icon size={24} />
