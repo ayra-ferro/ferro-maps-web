@@ -30,27 +30,14 @@ export default function HowItWorks() {
       </div>
 
       {/* Three columns */}
-      <div className="grid grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
         {steps.map(({ label, body }) => (
-          <div key={label} className="flex flex-col gap-4">
+          <div key={label} className="flex flex-col gap-4 h-full">
             {/* Block A — image placeholder */}
-            <div className="bg-neutral-200 rounded-card h-48 w-full flex items-center justify-center">
-              <svg
-                width="64"
-                height="48"
-                viewBox="0 0 64 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <rect x="1" y="1" width="62" height="46" rx="2" stroke="#9CA3AF" strokeWidth="2" />
-                <line x1="1" y1="1" x2="63" y2="47" stroke="#9CA3AF" strokeWidth="2" />
-                <line x1="63" y1="1" x2="1" y2="47" stroke="#9CA3AF" strokeWidth="2" />
-              </svg>
-            </div>
+            <div className="bg-neutral-200 rounded-card h-48 w-full" />
 
             {/* Block B — step text card */}
-            <div className="bg-white rounded-card p-6 shadow-elevation-1">
+            <div className="bg-white rounded-card p-6 shadow-elevation-1 flex-1">
               <h3 className="font-bold text-title text-neutral-900 mb-3">{label}</h3>
               <p className="text-body text-neutral-700">{body}</p>
             </div>
