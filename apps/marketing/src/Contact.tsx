@@ -67,7 +67,7 @@ export default function Contact() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 max-w-6xl mx-auto px-10 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-6xl mx-auto px-0 md:px-10 items-stretch">
 
         {/* LEFT — Contact form */}
         <div className="bg-surface-brand-subtle rounded-lg p-6 h-full">
@@ -178,13 +178,13 @@ export default function Contact() {
             const isOpen = openFaq === i
 
             return (
-              <div
-                key={i}
-                className={`border border-border-default rounded-lg px-4 py-4 mb-3 cursor-pointer shadow-sm flex-shrink-0 ${
-                  isOpen ? 'bg-surface-brand-subtle' : 'bg-white'
-                }`}
-                onClick={() => setOpenFaq(isOpen ? null : i)}
-              >
+            <div
+              key={i}
+              className={`border border-border-default rounded-lg px-4 py-4 cursor-pointer shadow-sm flex-1 flex flex-col justify-center ${
+                i < faqs.length - 1 ? 'mb-3' : ''
+              } ${isOpen ? 'bg-surface-brand-subtle' : 'bg-white'}`}
+              onClick={() => setOpenFaq(isOpen ? null : i)}
+            >
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-[12px] text-neutral-900">
                     {faq.q}
