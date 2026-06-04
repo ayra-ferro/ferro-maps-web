@@ -17,11 +17,11 @@ const navLink =
 
 export default function Footer() {
   const storeBtn =
-    'flex items-center gap-2 bg-black border border-neutral-700 rounded-md px-2 py-1 text-white hover:-translate-y-0.5 transition-all duration-fast'
+    'flex items-center gap-2 bg-black border border-neutral-700 rounded-md px-2 py-1 text-white hover:-translate-y-0.5 transition-all duration-fast w-full lg:w-auto'
 
   return (
-    <footer className="bg-surface-inverse text-white py-12 px-6">
-      <div className="grid grid-cols-4 gap-20 max-w-6xl mx-auto px-10">
+    <footer className="bg-surface-inverse text-white py-12 px-6 overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-4 lg:gap-20 max-w-6xl mx-auto px-0 md:px-4 lg:px-10">
 
         <div>
           <p className={`${overline} mb-5`}>PRODUCT</p>
@@ -64,10 +64,10 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div className="-ml-10">
+        <div className="lg:-ml-10">
           <p className={`${overline} mb-5`}>DOWNLOAD THE APP</p>
 
-          <div className="flex gap-2 mb-7">
+          <div className="flex flex-col lg:flex-row gap-2 mb-7">
             <a
               href="https://apps.apple.com"
               target="_blank"
@@ -117,12 +117,12 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-neutral-700 mt-10 pt-5 max-w-6xl mx-auto px-10 flex justify-between items-center">
+      <div className="border-t border-neutral-700 mt-10 pt-5 max-w-6xl mx-auto px-0 md:px-4 lg:px-10 flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
         <p className="text-[11px] text-neutral-500">
           Ferro Maps @ 2026. All rights reserved.
         </p>
 
-        <div className="flex gap-6">
+        <div className="flex flex-wrap gap-4 md:gap-6">
           <span className="text-[11px] text-neutral-500">All systems operational</span>
           <span className="text-[11px] text-neutral-500">London, United Kingdom</span>
           <span className="text-[11px] text-neutral-500">Made for drivers</span>
