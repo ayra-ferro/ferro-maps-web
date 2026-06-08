@@ -4,11 +4,11 @@ import { db } from './lib/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const faqs = [
-  { q: 'Question 1', a: 'Answer' },
-  { q: 'Question 2', a: 'Answer' },
-  { q: 'Question 3', a: 'Answer' },
-  { q: 'Question 4', a: 'Answer' },
-  { q: 'Question 5', a: 'Answer' },
+  { q: 'What is Ferro Maps?', a: 'Ferro Maps is a navigation for income app for gig economy drivers. It tells you where demand is highest in real time so you can position yourself smarter and earn more, before you drive there.' },
+  { q: 'Which cities is Ferro Maps available in?', a: 'Ferro Maps is currently live in London. We are building towards expansion across the UK and internationally in later phases. If you are outside London, you can join our waitlist to be notified when we launch in your area.' },
+  { q: 'What do Good, Great and Flawless mean?', a: "These are Ferro Maps' three demand tiers. Good means moderate demand in an area. Great means strong demand with solid earning potential. Flawless is the highest tier, a high-attendance event with a short window, meaning maximum earning opportunity right now." },
+  { q: 'Does Ferro Maps replace my Uber or Bolt app?', a: 'NO. Ferro Maps works alongside your existing driver apps. You continue to accept jobs through Uber, Bolt, or whichever platform you use. Ferro Maps is the intelligence layer you open between trips to decide where to position yourself next.' },
+  { q: 'How do I earn Ferro points?', a: 'You earn Ferro points automatically by driving to a demand hotspot within its countdown window. The app detects when you are within 200 metres of a hotspot and awards your points instantly. Your balance is always visible on your profile screen.' },
 ]
 
 const inputClass =
