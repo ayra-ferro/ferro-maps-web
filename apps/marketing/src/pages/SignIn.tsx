@@ -10,12 +10,10 @@ export default function SignIn() {
   // OTP state
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', ''])
   const [countdown, setCountdown] = useState(59)
-  const [resendKey, setResendKey] = useState(0)
   const digitRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
     if (screen !== 'otp') return
-    setCountdown(59)
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -26,7 +24,7 @@ export default function SignIn() {
       })
     }, 1000)
     return () => clearInterval(interval)
-  }, [screen, resendKey])
+  }, [screen])
 
   function handleDigitChange(index: number, value: string) {
     const digit = value.replace(/\D/g, '').slice(-1)
@@ -127,7 +125,7 @@ export default function SignIn() {
                 `Resend code in 0:${countdown.toString().padStart(2, '0')}`
               ) : (
                 <span
-                  onClick={() => setResendKey(k => k + 1)}
+                  onClick={() => setCountdown(59)}
                   className="cursor-pointer underline"
                 >
                   Resend code
