@@ -71,12 +71,20 @@ export default function Header() {
           </nav>
 
           {/* Desktop CTA */}
-          <button
-            className="hidden md:block bg-ferro-primary text-white rounded-lg px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-deep"
-            onClick={() => handleNavClick('download')}
-          >
-            Get Started
-          </button>
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/signin"
+              className="border border-ferro-primary bg-transparent text-ferro-primary rounded-lg px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
+            >
+              Sign In
+            </Link>
+            <button
+              className="bg-ferro-primary text-white rounded-lg px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-deep"
+              onClick={() => handleNavClick('download')}
+            >
+              Get Started
+            </button>
+          </div>
 
           {/* Mobile hamburger */}
           <button
@@ -104,6 +112,13 @@ export default function Header() {
                 {label}
               </a>
             ))}
+            <Link
+              to="/signin"
+              className="block px-6 py-4 text-neutral-700 font-medium no-underline border-t border-neutral-100 transition-colors duration-fast hover:text-ferro-primary"
+              onClick={() => setMenuOpen(false)}
+            >
+              Sign In
+            </Link>
           </div>
         )}
       </header>
