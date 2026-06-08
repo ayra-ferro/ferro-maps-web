@@ -10,7 +10,6 @@ import AppScreenshots from './AppScreenshots'
 import Contact from './Contact'
 import DownloadBanner from './DownloadBanner'
 import Footer from './Footer'
-import SEOHead from './SEOHead'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 
 function Home() {
@@ -28,7 +27,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-white text-text-primary font-geist">
-      <SEOHead />
       <Header />
       <Hero />
 
