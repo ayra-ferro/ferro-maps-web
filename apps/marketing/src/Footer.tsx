@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const AppleIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -56,9 +57,15 @@ export default function Footer() {
           <ul className="flex flex-col gap-3">
             {['Privacy Policy', 'Terms & Conditions', 'Cookies'].map((label) => (
               <li key={label}>
-                <a href="#" className={navLink.replace('cursor-pointer', '')}>
-                  {label}
-                </a>
+                {label === 'Privacy Policy' ? (
+                  <Link to="/privacy-policy" className={navLink.replace('cursor-pointer', '')}>
+                    {label}
+                  </Link>
+                ) : (
+                  <a href="#" className={navLink.replace('cursor-pointer', '')}>
+                    {label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
