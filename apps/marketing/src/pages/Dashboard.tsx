@@ -40,7 +40,6 @@ function ProfileSection() {
 
   const { user } = useAuth()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     async function fetchUser() {
       if (!user) {
@@ -248,8 +247,8 @@ function SettingsSection() {
       await updateEmail(auth.currentUser, email)
       setSuccess('Email updated successfully.')
       setEmail('')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError('An error occurred. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -260,8 +259,8 @@ function SettingsSection() {
       if (!auth.currentUser) return
       await deleteUser(auth.currentUser)
       navigate('/')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError('An error occurred. Please try again.')
       setShowDeleteConfirm(false)
     }
   }
