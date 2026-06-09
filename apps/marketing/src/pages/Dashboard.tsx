@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
+import { signOut, updateEmail, deleteUser } from 'firebase/auth'
 import { User, History, Settings, LogOut, Menu } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
 import { auth } from '../lib/firebase'
 import ferroLogo from '../assets/ferro-logo-2.png'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import avatarCrow from '../assets/avatars/ferro-bird-crow.png'
 import avatarDetective from '../assets/avatars/ferro-bird-detective.png'
@@ -163,6 +163,174 @@ function ProfileSection() {
   )
 }
 
+function HistorySection() {
+  const { user } = useAuth()
+  const [history, setHistory] = useState<{ id: string, hotspot: string, tier: string, points: number, timestamp: any }[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    async function fetchHistory() {
+      if (!user) {
+        setLoading(false)
+        return
+      }
+      try {
+        const q = query(
+          collection(db, 'users', user.uid, 'ferroEarnings'),
+          orderBy('timestamp', 'desc'),
+          limit(20)
+        )
+        const snap = await getDocs(q)
+        setHistory(snap.docs.map(d => ({ id: d.id, ...d.data() } as { id: string, hotspot: string, tier: string, points: number, timestamp: any })))
+      } catch {
+        setError('Failed to load history.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchHistory()
+  }, [user])
+
+  if (!user) return <p className="text-neutral-500 text-center p-8">Please sign in to view your history.</p>
+  if (loading) return <div className="flex justify-center mt-12"><div className="animate-spin border-4 border-ferro-primary border-t-transparent rounded-full w-8 h-8" /></div>
+  if (error) return <p className="text-red-500 text-center p-8">{error}</p>
+  if (history.length === 0) return (
+    <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+      <p className="text-neutral-500">No earnings history yet. Start driving to earn Ferro points!</p>
+    </div>
+  )
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-gray-100">
+        <h2 className="text-xl font-bold text-ferro-ink">Earnings History</h2>
+      </div>
+      {history.map(item => {
+        const tierClass =
+          item.tier === 'flawless' ? 'bg-ferro-signal text-ferro-ink' :
+          item.tier === 'great' ? 'bg-ferro-primary text-white' :
+          'bg-ferro-tint text-ferro-primary'
+        return (
+          <div key={item.id} className="flex items-center justify-between p-4 border-b border-gray-50 last:border-b-0">
+            <div>
+              <p className="font-semibold text-ferro-ink text-sm">{item.hotspot}</p>
+              <p className="text-neutral-500 text-xs mt-1">
+                {new Date(item.timestamp.toDate()).toLocaleDateString('en-GB')}
+              </p>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${tierClass}`}>{item.tier}</span>
+              <p className="text-ferro-primary font-bold text-sm mt-1 text-right">+{item.points} Ferro</p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function SettingsSection() {
+  const { user } = useAuth()
+  const [email, setEmail] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [error, setError] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const navigate = useNavigate()
+
+  async function handleUpdateEmail() {
+    setSaving(true)
+    setError('')
+    setSuccess('')
+    try {
+      if (!auth.currentUser) return
+      await updateEmail(auth.currentUser, email)
+      setSuccess('Email updated successfully.')
+      setEmail('')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      if (!auth.currentUser) return
+      await deleteUser(auth.currentUser)
+      navigate('/')
+    } catch (err: any) {
+      setError(err.message)
+      setShowDeleteConfirm(false)
+    }
+  }
+
+  if (!user) return <p className="text-neutral-500 text-center p-8">Please sign in to view settings.</p>
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-8">
+      <h2 className="text-xl font-bold text-ferro-ink mb-6">Settings</h2>
+
+      <div>
+        <p className="font-semibold text-ferro-ink mb-3">Update Email</p>
+        <p className="text-neutral-500 text-sm mb-3">Current: {user.email || 'No email set'}</p>
+        <input
+          type="email"
+          placeholder="Enter new email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="border border-gray-200 rounded-lg px-4 py-2 w-full mb-3 focus:outline-none focus:border-ferro-primary text-sm"
+        />
+        <button
+          onClick={handleUpdateEmail}
+          className="bg-ferro-primary text-white rounded-lg px-6 py-2 font-semibold text-sm"
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+        {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      </div>
+
+      <hr className="my-6 border-gray-100" />
+
+      <div>
+        <p className="font-semibold text-ferro-ink mb-2">Delete Account</p>
+        <p className="text-neutral-500 text-sm mb-4">Permanently delete your account and all associated data. This cannot be undone.</p>
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="border border-red-300 text-red-500 rounded-lg px-6 py-2 font-semibold text-sm hover:bg-red-50"
+        >
+          Delete Account
+        </button>
+      </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-xl font-bold text-ferro-ink mb-2">Are you sure?</h3>
+            <p className="text-neutral-500 text-sm mb-6">This will permanently delete your account and all your data. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="border border-gray-200 text-neutral-600 rounded-lg px-6 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="bg-red-500 text-white rounded-lg px-6 py-2 font-semibold text-sm"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [tab, setTab] = useState<Tab>('profile')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -233,18 +401,8 @@ export default function Dashboard() {
         {/* Content area */}
         <div className="flex-1 p-6 md:p-8 overflow-y-auto pb-20 md:pb-8">
           {tab === 'profile' && <ProfileSection />}
-          {tab === 'history' && (
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h1 className="text-2xl font-bold text-ferro-ink">History</h1>
-              <p className="text-neutral-500 mt-2">Content coming soon.</p>
-            </div>
-          )}
-          {tab === 'settings' && (
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h1 className="text-2xl font-bold text-ferro-ink">Settings</h1>
-              <p className="text-neutral-500 mt-2">Content coming soon.</p>
-            </div>
-          )}
+          {tab === 'history' && <HistorySection />}
+          {tab === 'settings' && <SettingsSection />}
         </div>
       </div>
 
