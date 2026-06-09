@@ -2,7 +2,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
-import { initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from 'firebase/app-check';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -20,18 +20,12 @@ if (import.meta.env.DEV || import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN) 
   (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN;
 }
 
-initializeAppCheck(app, {
-  provider: import.meta.env.PROD
-    ? new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY)
-    : new CustomProvider({
-        getToken: () =>
-          Promise.resolve({
-            token: import.meta.env.VITE_FIREBASE_APP_CHECK_DEBUG_TOKEN as string,
-            expireTimeMillis: Date.now() + 60 * 60 * 1000,
-          }),
-      }),
-  isTokenAutoRefreshEnabled: true,
-});
+if (import.meta.env.PROD) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
