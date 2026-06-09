@@ -40,10 +40,15 @@ function ProfileSection() {
 
   const { user } = useAuth()
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!user) { setLoading(false); return }
-    getDoc(doc(db, 'users', user.uid))
-      .then(snap => {
+    async function fetchUser() {
+      if (!user) {
+        setLoading(false)
+        return
+      }
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid))
         if (snap.exists()) {
           const data = snap.data()
           setUserData({
@@ -54,9 +59,13 @@ function ProfileSection() {
           })
           setEditName(data.displayName || '')
         }
-      })
-      .catch(() => setError('Failed to load profile.'))
-      .finally(() => setLoading(false))
+      } catch {
+        setError('Failed to load profile.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUser()
   }, [user])
 
   if (!user) return <p className="text-neutral-500 text-center p-8">Please sign in to view your profile.</p>
