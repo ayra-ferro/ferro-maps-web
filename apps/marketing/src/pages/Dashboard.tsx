@@ -247,7 +247,7 @@ function SettingsSection() {
       await updateEmail(auth.currentUser, email)
       setSuccess('Email updated successfully.')
       setEmail('')
-    } catch (err: unknown) {
+    } catch {
       setError('An error occurred. Please try again.')
     } finally {
       setSaving(false)
@@ -259,7 +259,7 @@ function SettingsSection() {
       if (!auth.currentUser) return
       await deleteUser(auth.currentUser)
       navigate('/')
-    } catch (err: unknown) {
+    } catch {
       setError('An error occurred. Please try again.')
       setShowDeleteConfirm(false)
     }
