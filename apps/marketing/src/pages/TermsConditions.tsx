@@ -24,43 +24,6 @@ const tocLinks = [
   { id: 'contact-us', label: '20. Contact us' },
 ]
 
-function Table({ headers, rows }: { headers: string[]; rows: string[][] }) {
-  return (
-    <div className="overflow-x-auto my-5 rounded-lg border border-border-default">
-      <table className="w-full text-sm">
-        {headers.length > 0 && (
-          <thead>
-            <tr className="bg-neutral-50 border-b border-border-default">
-              {headers.map((h, i) => (
-                <th key={i} className="text-left px-4 py-3 text-text-secondary font-semibold whitespace-nowrap">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        )}
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri} className="border-b border-border-default last:border-b-0">
-              {row.map((cell, ci) => (
-                <td
-                  key={ci}
-                  className={`px-4 py-3 align-top ${
-                    headers.length === 0 && ci === 0
-                      ? 'font-medium text-text-secondary w-52 whitespace-nowrap'
-                      : 'text-text-primary'
-                  }`}
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
 
 export default function TermsConditions() {
   return (
