@@ -237,7 +237,20 @@ function SettingsSection() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    async function fetchNotificationPref() {
+      if (!user) return
+      const snap = await getDoc(doc(db, 'users', user.uid))
+      if (snap.exists()) {
+        const data = snap.data()
+        setNotificationsEnabled(data.notificationsEnabled !== undefined ? data.notificationsEnabled : true)
+      }
+    }
+    fetchNotificationPref()
+  }, [user])
 
   async function handleUpdateEmail() {
     setSaving(true)
@@ -271,6 +284,28 @@ function SettingsSection() {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-8">
       <h2 className="text-xl font-bold text-ferro-ink mb-6">Settings</h2>
+
+      <div>
+        <p className="font-semibold text-ferro-ink mb-3">Notification Preferences</p>
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-6">
+          <div>
+            <p className="text-sm font-medium text-ferro-ink">Flawless hotspot alerts</p>
+            <p className="text-neutral-500 text-xs mt-1">Get notified when high-demand opportunities are near you</p>
+          </div>
+          <button
+            onClick={async () => {
+              const newVal = !notificationsEnabled
+              setNotificationsEnabled(newVal)
+              if (user) await updateDoc(doc(db, 'users', user.uid), { notificationsEnabled: newVal })
+            }}
+            className={`w-12 h-6 rounded-full transition-colors flex items-center px-1 ${notificationsEnabled ? 'bg-ferro-primary' : 'bg-gray-300'}`}
+          >
+            <span className={`w-4 h-4 bg-white rounded-full transition-transform ${notificationsEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
+      </div>
+
+      <hr className="my-6 border-gray-100" />
 
       <div>
         <p className="font-semibold text-ferro-ink mb-3">Update Email</p>
