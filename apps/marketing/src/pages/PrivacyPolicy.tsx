@@ -59,7 +59,7 @@ function Table({ headers, rows }: { headers: string[]; rows: string[][] }) {
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-white text-text-primary font-geist">
+    <div className="min-h-screen bg-white text-text-primary font-nunito">
       <Header />
 
       {/* Hero */}
