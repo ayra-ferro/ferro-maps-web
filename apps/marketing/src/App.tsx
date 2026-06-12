@@ -30,7 +30,7 @@ function Home() {
   }, [location.hash])
 
   return (
-    <div className="min-h-screen bg-white text-text-primary font-geist">
+    <div className="min-h-screen bg-white text-text-primary font-nunito">
       <Header />
       <Hero />
 
