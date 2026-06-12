@@ -1,9 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth'
+import type { ConfirmationResult } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import { auth, db } from '../lib/firebase'
 import ferroLogo from '../assets/ferro-logo-2.png'
 
 type SignInState = 'phone' | 'otp'
 
 export default function SignIn() {
+  const navigate = useNavigate()
+
   const [screen, setScreen] = useState<SignInState>('phone')
   const [phoneNumber, setPhoneNumber] = useState('')
 
@@ -11,6 +18,19 @@ export default function SignIn() {
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', ''])
   const [countdown, setCountdown] = useState(59)
   const digitRefs = useRef<(HTMLInputElement | null)[]>([])
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null)
+
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null)
+  const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (recaptchaVerifierRef.current) return
+    recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+    })
+    recaptchaVerifierRef.current.render()
+  }, [])
 
   useEffect(() => {
     if (screen !== 'otp') return
@@ -25,6 +45,51 @@ export default function SignIn() {
     }, 1000)
     return () => clearInterval(interval)
   }, [screen])
+
+  async function handleSendOtp() {
+    setError('')
+    setLoading(true)
+    try {
+      const fullNumber = '+44' + phoneNumber.trim()
+      const result = await signInWithPhoneNumber(auth, fullNumber, recaptchaVerifierRef.current!)
+      setConfirmationResult(result)
+      setScreen('otp')
+    } catch (err: any) {
+      console.error('Full error:', err)
+      console.error('Error code:', err.code)
+      console.error('Error message:', err.message)
+      setError(err.code + ': ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleVerifyOtp() {
+    setError('')
+    setLoading(true)
+    try {
+      const code = digits.join('')
+      if (!confirmationResult) return
+      const userCredential = await confirmationResult.confirm(code)
+      const user = userCredential.user
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      if (!userDoc.exists()) {
+        setError('No Ferro Maps account found. Please download the app to register.')
+        setScreen('phone')
+        setTimeout(() => {
+          document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' })
+        }, 2000)
+        return
+      }
+
+      navigate('/dashboard')
+    } catch (err: any) {
+      setError('Invalid code. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   function handleDigitChange(index: number, value: string) {
     const digit = value.replace(/\D/g, '').slice(-1)
@@ -73,13 +138,14 @@ export default function SignIn() {
             </div>
 
             <button
-              onClick={() => setScreen('otp')}
+              onClick={handleSendOtp}
               className="bg-ferro-primary text-white rounded-lg py-3 font-semibold text-sm tracking-widest uppercase w-full"
             >
-              Continue
+              {loading ? 'Sending...' : 'Continue'}
             </button>
 
-            <div id="recaptcha-container" />
+            {error && <p className="text-red-500 text-sm text-center mt-3">{error}</p>}
+
           </div>
 
           <p className="text-white text-xs text-center mt-6 opacity-75 max-w-sm mx-auto">
@@ -114,11 +180,13 @@ export default function SignIn() {
             </div>
 
             <button
-              onClick={() => console.log(digits.join(''))}
+              onClick={handleVerifyOtp}
               className="bg-ferro-primary text-white rounded-lg py-3 font-semibold text-sm tracking-widest uppercase w-full"
             >
-              Verify
+              {loading ? 'Verifying...' : 'Verify'}
             </button>
+
+            {error && <p className="text-red-500 text-sm text-center mt-3">{error}</p>}
 
             <div className="text-gray-500 text-sm text-center mt-4">
               {countdown > 0 ? (
@@ -135,6 +203,8 @@ export default function SignIn() {
           </div>
         </>
       )}
+
+      <div id="recaptcha-container" className="hidden" />
     </div>
   )
 }
