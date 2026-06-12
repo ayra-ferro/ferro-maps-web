@@ -61,6 +61,10 @@ export default function Footer() {
                   <Link to="/privacy-policy" className={navLink.replace('cursor-pointer', '')}>
                     {label}
                   </Link>
+                ) : label === 'Terms & Conditions' ? (
+                  <Link to="/terms-conditions" className={navLink.replace('cursor-pointer', '')}>
+                    {label}
+                  </Link>
                 ) : (
                   <a href="#" className={navLink.replace('cursor-pointer', '')}>
                     {label}
