@@ -27,11 +27,11 @@ export default function DownloadBanner() {
       <div className="relative max-w-7xl mx-auto px-6 md:px-16 py-8 md:py-0 md:h-[350px] flex flex-col md:flex-row md:items-center">
 
         {/* Bird — lg and above only, sits at bottom-left of banner */}
-        <div className="hidden lg:block absolute bottom-0 left-0 -ml-1 h-96 w-[47%] overflow-hidden">
+        <div className="hidden lg:block absolute bottom-0 left-[10%] h-96 w-[47%] overflow-hidden">
           <img
-            src="/ferro-bird.png"
+            src="/ferro-bird-2.png"
             alt="Ferro Maps mascot"
-            className="h-full w-full object-cover object-top"
+            className="h-full w-auto object-contain"
           />
         </div>
 
