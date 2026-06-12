@@ -11,6 +11,7 @@ import Contact from './Contact'
 import DownloadBanner from './DownloadBanner'
 import Footer from './Footer'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsConditions from './pages/TermsConditions'
 import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
 import { AuthProvider } from './context/AuthContext'
@@ -56,6 +57,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-conditions" element={<TermsConditions />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           </Routes>
