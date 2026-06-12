@@ -11,6 +11,10 @@ import Contact from './Contact'
 import DownloadBanner from './DownloadBanner'
 import Footer from './Footer'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import SignIn from './pages/SignIn'
+import Dashboard from './pages/Dashboard'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function Home() {
   const location = useLocation()
@@ -48,10 +52,14 @@ export default function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>
   )
