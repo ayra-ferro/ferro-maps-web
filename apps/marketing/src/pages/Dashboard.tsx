@@ -28,6 +28,7 @@ const AVATARS = [
   { id: 'phoenix', src: avatarPhoenix, label: 'Phoenix' },
   { id: 'superhero', src: avatarSuperhero, label: 'Superhero' },
   { id: 'villain', src: avatarVillain, label: 'Villain' },
+  { id: 'ferro2', src: '/ferro-bird-2.png', label: 'Ferro' },
 ]
 
 function ProfileSection() {
