@@ -9,7 +9,7 @@ export default function Hero() {
 
         {/* Left column */}
         <div>
-          <h1 className="font-extrabold text-display text-neutral-900 font-geist">
+          <h1 className="font-extrabold text-display text-neutral-900 font-nunito">
             Navigation for
             <br />
             <span className="text-ferro-primary">Income.</span>
