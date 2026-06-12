@@ -54,11 +54,8 @@ export default function SignIn() {
       const result = await signInWithPhoneNumber(auth, fullNumber, recaptchaVerifierRef.current!)
       setConfirmationResult(result)
       setScreen('otp')
-    } catch (err: any) {
-      console.error('Full error:', err)
-      console.error('Error code:', err.code)
-      console.error('Error message:', err.message)
-      setError(err.code + ': ' + err.message)
+    } catch {
+      setError('Failed to send code. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -84,7 +81,7 @@ export default function SignIn() {
       }
 
       navigate('/dashboard')
-    } catch (err: any) {
+    } catch {
       setError('Invalid code. Please try again.')
     } finally {
       setLoading(false)
