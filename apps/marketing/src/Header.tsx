@@ -49,7 +49,7 @@ export default function Header() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-16 py-4 flex items-center justify-between">
-          <Link to="/" className="font-bold text-ferro-primary font-geist text-subtitle whitespace-nowrap">
+          <Link to="/" className="font-bold text-ferro-primary font-nunito text-subtitle whitespace-nowrap">
             Ferro Maps
           </Link>
 
