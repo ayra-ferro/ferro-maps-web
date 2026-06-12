@@ -80,6 +80,7 @@ export default {
       },
       fontFamily: {
         geist: ["Geist", "sans-serif"],
+        nunito: ["Nunito", "sans-serif"],
       },
       fontWeight: {
         normal: "400",
