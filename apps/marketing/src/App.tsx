@@ -14,7 +14,6 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsConditions from './pages/TermsConditions'
 import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
-import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function Home() {
@@ -53,7 +52,6 @@ export default function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <AuthProvider>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -61,7 +59,6 @@ export default function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           </Routes>
-        </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>
   )
