@@ -1,0 +1,10 @@
+{
+  "name": "ferro-maps-admin-claim-tool",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "FM-WEB-041 — one-off tool for setting the role:admin custom claim on Ferro Maps admin Firebase Auth users",
+  "dependencies": {
+    "firebase-admin": "^14.0.0"
+  }
+}
