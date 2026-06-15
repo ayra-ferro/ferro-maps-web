@@ -7,14 +7,22 @@
  *   node set-admin-claim.mjs <email> --check     Show current custom claims
  *   node set-admin-claim.mjs <email> --remove    Remove the admin claim
  *
- * Requires serviceAccountKey.json in this folder (see README.md).
+ * Auth: ferro-maps-staging-v2 has iam.disableServiceAccountKeyCreation enabled
+ * via org policy, so the expected auth method is Application Default Credentials:
+ *
+ *   gcloud auth application-default login
+ *   gcloud auth application-default set-quota-project ferro-maps-staging-v2
+ *
+ * If serviceAccountKey.json is present in this folder it is used instead (fallback
+ * for if the org policy is ever relaxed). See README.md.
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, applicationDefault, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 const SERVICE_ACCOUNT_PATH = new URL('./serviceAccountKey.json', import.meta.url);
+const PROJECT_ID = 'ferro-maps-staging-v2';
 
 const [, , email, flag] = process.argv;
 
@@ -23,14 +31,11 @@ if (!email) {
   process.exit(1);
 }
 
-if (!existsSync(SERVICE_ACCOUNT_PATH)) {
-  console.error('serviceAccountKey.json not found in this folder. See README.md.');
-  process.exit(1);
-}
+const credential = existsSync(SERVICE_ACCOUNT_PATH)
+  ? cert(JSON.parse(readFileSync(SERVICE_ACCOUNT_PATH, 'utf8')))
+  : applicationDefault();
 
-const serviceAccount = JSON.parse(readFileSync(SERVICE_ACCOUNT_PATH, 'utf8'));
-
-initializeApp({ credential: cert(serviceAccount) });
+initializeApp({ credential, projectId: PROJECT_ID });
 
 const auth = getAuth();
 const user = await auth.getUserByEmail(email);
