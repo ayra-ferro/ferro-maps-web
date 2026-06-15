@@ -222,12 +222,18 @@ importers:
       geist:
         specifier: ^1.7.1
         version: 1.7.2(next@16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
+      lucide-react:
+        specifier: ^1.16.0
+        version: 1.17.0(react@19.2.7)
       react:
         specifier: ^19.2.6
         version: 19.2.7
       react-dom:
         specifier: ^19.2.6
         version: 19.2.7(react@19.2.7)
+      react-router-dom:
+        specifier: ^7.17.0
+        version: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
