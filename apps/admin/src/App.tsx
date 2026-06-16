@@ -5,6 +5,7 @@ import PublicOnlyRoute from './components/PublicOnlyRoute'
 import SignIn from './pages/SignIn'
 import CreateAccount from './pages/CreateAccount'
 import Dashboard from './pages/Dashboard'
+import ComingSoon from './pages/ComingSoon'
 
 export default function App() {
   return (
@@ -25,6 +26,38 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/drivers"
+            element={
+              <ProtectedRoute>
+                <ComingSoon label="Drivers" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hotspots"
+            element={
+              <ProtectedRoute>
+                <ComingSoon label="Hotspots" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <ComingSoon label="Messages" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <ComingSoon label="Settings" />
               </ProtectedRoute>
             }
           />
