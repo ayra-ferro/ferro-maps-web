@@ -1,0 +1,56 @@
+<svg width="420" height="280" viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg">
+<title>Ferro Maps gray car illustration</title>
+<g transform="translate(0,40)">
+  <ellipse cx="200" cy="195" rx="220" ry="14" fill="#000000" opacity="0.10"/>
+
+  <path d="M10 150
+           Q5 100 60 85
+           L100 35
+           Q115 18 145 18
+           L260 18
+           Q300 18 325 45
+           L375 95
+           Q420 100 420 145
+           Q420 168 395 170
+           L25 170
+           Q10 168 10 150 Z"
+        fill="#A8A6A0" stroke="#1A1A1A" stroke-width="4" stroke-linejoin="round"/>
+
+  <path d="M108 88 L130 42 Q140 28 158 28 L210 28 L210 88 Z"
+        fill="#1F2937" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M218 28 L255 28 Q278 28 295 47 L320 88 L218 88 Z"
+        fill="#1F2937" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="213" y1="28" x2="213" y2="88" stroke="#1A1A1A" stroke-width="3"/>
+
+  <ellipse cx="375" cy="78" rx="14" ry="9" fill="#6B6963" stroke="#1A1A1A" stroke-width="3"/>
+
+  <rect x="150" y="120" width="34" height="9" rx="4" fill="#E5E3DA" stroke="#1A1A1A" stroke-width="2"/>
+  <line x1="216" y1="92" x2="216" y2="168" stroke="#1A1A1A" stroke-width="3"/>
+
+  <circle cx="95" cy="172" r="38" fill="#1A1A1A"/>
+  <circle cx="95" cy="172" r="24" fill="#888780"/>
+  <circle cx="95" cy="172" r="9" fill="#1A1A1A"/>
+  <line x1="95" y1="155" x2="95" y2="163" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="95" y1="181" x2="95" y2="189" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="78" y1="172" x2="86" y2="172" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="104" y1="172" x2="112" y2="172" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="83" y1="160" x2="89" y2="166" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="101" y1="178" x2="107" y2="184" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="107" y1="160" x2="101" y2="166" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="89" y1="178" x2="83" y2="184" stroke="#1A1A1A" stroke-width="3"/>
+
+  <circle cx="335" cy="172" r="38" fill="#1A1A1A"/>
+  <circle cx="335" cy="172" r="24" fill="#888780"/>
+  <circle cx="335" cy="172" r="9" fill="#1A1A1A"/>
+  <line x1="335" y1="155" x2="335" y2="163" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="335" y1="181" x2="335" y2="189" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="318" y1="172" x2="326" y2="172" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="344" y1="172" x2="352" y2="172" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="323" y1="160" x2="329" y2="166" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="341" y1="178" x2="347" y2="184" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="347" y1="160" x2="341" y2="166" stroke="#1A1A1A" stroke-width="3"/>
+  <line x1="329" y1="178" x2="323" y2="184" stroke="#1A1A1A" stroke-width="3"/>
+
+  <rect x="392" y="130" width="20" height="10" rx="3" fill="#E5E3DA" stroke="#1A1A1A" stroke-width="2"/>
+</g>
+</svg>
