@@ -37,6 +37,10 @@ export default function Contact() {
         message,
         agreedToPolicy: agreed,
         submittedAt: serverTimestamp(),
+        status: 'open',
+        ticketNumber: Date.now(),
+        subject: message.trim().slice(0, 60),
+        replies: [],
       })
 
       setSuccess(true)
