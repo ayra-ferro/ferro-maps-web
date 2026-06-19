@@ -21,9 +21,11 @@ export default function DownloadBanner() {
 
   return (
     <section
-      id="download"
+      id="download-banner"
       className="bg-ferro-primary overflow-hidden"
     >
+      {/* Backward-compat anchor — scrollTo('download') from Hero/Header finds this */}
+      <div id="download" />
       <div className="relative max-w-7xl mx-auto px-6 md:px-16 py-8 md:py-0 md:h-[350px] flex flex-col md:flex-row md:items-center">
 
         {/* Bird — lg and above only, sits at bottom-left of banner */}
