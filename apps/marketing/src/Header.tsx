@@ -5,7 +5,7 @@ import { Menu, X } from 'lucide-react'
 const navLinks = [
   { id: 'why-ferro-maps', label: 'Why Ferro Maps' },
   { id: 'how-it-works', label: 'How It Works' },
-  { id: 'driver-stories', label: 'Driver Stories' },
+  { id: 'testimonials', label: 'Driver Stories' },
   { id: 'contact', label: 'Contact' },
 ]
 
