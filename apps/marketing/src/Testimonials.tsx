@@ -92,7 +92,7 @@ export default function Testimonials() {
   const cards = [...testimonials, ...testimonials]
 
   return (
-    <section id="driver-stories" className="bg-white py-24 px-6">
+    <section id="testimonials" className="bg-white py-24 px-6">
       <style>{KEYFRAMES}</style>
       <div className="text-center">
         <p className="text-ferro-primary text-overline font-semibold tracking-widest uppercase mb-4">
