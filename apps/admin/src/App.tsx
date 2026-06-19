@@ -6,6 +6,7 @@ import SignIn from './pages/SignIn'
 import CreateAccount from './pages/CreateAccount'
 import Dashboard from './pages/Dashboard'
 import ComingSoon from './pages/ComingSoon'
+import Messages from './pages/Messages'
 
 export default function App() {
   return (
@@ -49,7 +50,7 @@ export default function App() {
             path="/messages"
             element={
               <ProtectedRoute>
-                <ComingSoon label="Messages" />
+                <Messages />
               </ProtectedRoute>
             }
           />
