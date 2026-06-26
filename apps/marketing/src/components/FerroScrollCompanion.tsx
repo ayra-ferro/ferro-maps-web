@@ -1,71 +1,82 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { Home, Map, Smartphone, ListOrdered, Quote, Download } from 'lucide-react'
+import ferroCar from '../assets/ferro-car.svg'
 
 const SECTIONS = [
-  { id: 'hero',            Icon: Home,        label: 'Hero',            pct: 5  },
-  { id: 'why-ferro-maps',  Icon: Map,         label: 'Why Ferro Maps',  pct: 23 },
-  { id: 'app-screenshots', Icon: Smartphone,  label: 'App Screenshots', pct: 41 },
-  { id: 'how-it-works',   Icon: ListOrdered, label: 'How It Works',    pct: 59 },
-  { id: 'testimonials',   Icon: Quote,       label: 'Testimonials',    pct: 77 },
-  { id: 'download-banner', Icon: Download,    label: 'Download Banner', pct: 95 },
+  { id: 'hero',            railPct: 0  },
+  { id: 'why-ferro-maps',  railPct: 20 },
+  { id: 'app-screenshots', railPct: 40 },
+  { id: 'how-it-works',   railPct: 60 },
+  { id: 'testimonials',   railPct: 80 },
 ]
+
+const RAIL_FRAC     = 0.45
+const RAIL_TOP_FRAC = 0.30                         // rail top edge at 30 vh
+const RAIL_BOT_FRAC = RAIL_TOP_FRAC + RAIL_FRAC   // 0.75
 
 export default function FerroScrollCompanion() {
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
   )
-  const [activeDot, setActiveDot] = useState(0)
 
   const wrapperRef    = useRef<HTMLDivElement>(null)
-  const railRef       = useRef<HTMLDivElement>(null)
-  const fillRef       = useRef<HTMLDivElement>(null)
-  const birdRef       = useRef<HTMLDivElement>(null)
+  const fillRectRef   = useRef<SVGRectElement>(null)
+  const carOuterRef   = useRef<HTMLDivElement>(null)
+  const carBounceRef  = useRef<HTMLDivElement>(null)
+  const birdOuterRef  = useRef<HTMLDivElement>(null)
+  const birdBubbleRef = useRef<HTMLDivElement>(null)
   const birdBounceRef = useRef<HTMLDivElement>(null)
+  const dotRefs       = useRef<(HTMLDivElement | null)[]>([])
 
   const hasLandedRef = useRef(false)
-  const activeDotRef = useRef(0)
+  const birdGoldRef  = useRef(false)
+  const carPctRef    = useRef(0)
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Reduced-motion listener — always mounted, independent of animation effect
+  // Reduced-motion change listener
   useEffect(() => {
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const mql     = window.matchMedia('(prefers-reduced-motion: reduce)')
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
     mql.addEventListener('change', handler)
     return () => mql.removeEventListener('change', handler)
   }, [])
 
+  // Main animation effect — re-runs if reducedMotion changes
   useEffect(() => {
     if (reducedMotion) return
 
     const wrapperEl    = wrapperRef.current
-    const railEl       = railRef.current
-    const fillEl       = fillRef.current
-    const birdEl       = birdRef.current
+    const fillRectEl   = fillRectRef.current
+    const carOuterEl   = carOuterRef.current
+    const carBounceEl  = carBounceRef.current
+    const birdOuterEl  = birdOuterRef.current
+    const birdBubbleEl = birdBubbleRef.current
     const birdBounceEl = birdBounceRef.current
-    if (!wrapperEl || !railEl || !fillEl || !birdEl || !birdBounceEl) return
+    if (
+      !wrapperEl  || !fillRectEl  || !carOuterEl  || !carBounceEl ||
+      !birdOuterEl || !birdBubbleEl || !birdBounceEl
+    ) return
 
-    // Sets rail top and aligns bird vertically on the rail centre line
-    function measure() {
-      const headerEl  = document.querySelector<HTMLElement>('header')
-      const navBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 64
-      const railTop   = Math.max(0, navBottom - 14)
-      railEl!.style.top = `${railTop}px`
-      birdEl!.style.top = `${railTop - 2}px`
+    // ── Rail geometry helpers ─────────────────────────────────────────────────
+
+    const railTopPx    = () => RAIL_TOP_FRAC * window.innerHeight
+    const railHeightPx = () => RAIL_FRAC      * window.innerHeight
+    const railBotPx    = () => RAIL_BOT_FRAC  * window.innerHeight
+
+    function placeBird() {
+      birdOuterEl!.style.top = `${railBotPx()}px`
     }
 
-    // Place bird on first dot immediately at mount
-    measure()
-    birdEl.style.left  = `${birdLeftPx(5)}px`
-    fillEl.style.width = '5%'
+    function placeCarAt(pct: number) {
+      carPctRef.current = pct
+      carOuterEl!.style.top = `${railTopPx() + (pct / 100) * railHeightPx()}px`
+      // SVG viewBox is 0 0 2 100 — set height in viewBox units (= %)
+      fillRectEl!.setAttribute('height', String(pct))
+    }
 
-    // Idle bounce — runs continuously on the inner wrapper
-    const bounceTween = gsap.to(birdBounceEl, {
-      y: -3, duration: 0.8, repeat: -1, yoyo: true, ease: 'sine.inOut',
-    })
+    // ── Scroll math ───────────────────────────────────────────────────────────
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    function getProgress(): number {
+    function getScrollProgress(): number {
       const hero   = document.getElementById('hero')
       const banner = document.getElementById('download-banner')
       if (!hero || !banner) return 0
@@ -75,69 +86,80 @@ export default function FerroScrollCompanion() {
       return Math.max(0, Math.min(1, (window.scrollY - start) / (end - start)))
     }
 
-    // Maps 0-1 scroll progress to a dot percentage (5–95), with ±4% snapping
-    function getBirdPct(progress: number): number {
-      let pct = 5 + progress * 90
-      for (const { pct: dotPct } of SECTIONS) {
-        if (Math.abs(pct - dotPct) <= 4) { pct = dotPct; break }
+    function computeCarPct(progress: number): { pct: number; snappedIdx: number } {
+      // Map 0–0.85 → rail 0–80 %, 0.85–0.95 → interpolate, 0.95+ → 96
+      let raw: number
+      if (progress <= 0.85) {
+        raw = (progress / 0.85) * 80
+      } else if (progress >= 0.95) {
+        raw = 96
+      } else {
+        raw = 80 + ((progress - 0.85) / 0.10) * 16
       }
-      return pct
+      // Snap to any dot within ±5 rail-percentage points
+      for (let i = 0; i < SECTIONS.length; i++) {
+        if (Math.abs(raw - SECTIONS[i].railPct) <= 5) {
+          return { pct: SECTIONS[i].railPct, snappedIdx: i }
+        }
+      }
+      return { pct: raw, snappedIdx: -1 }
     }
 
-    // Converts a rail percentage to the bird's absolute left (px) in the fixed wrapper
-    function birdLeftPx(pct: number): number {
-      return (pct / 100) * window.innerWidth - 16
+    function updateDots(pct: number, snappedIdx: number) {
+      SECTIONS.forEach((s, i) => {
+        const el = dotRefs.current[i]
+        if (!el) return
+        el.style.opacity    = snappedIdx === i ? '0' : '1'
+        el.style.background = pct >= s.railPct ? '#1E7BFF' : '#D3D1C7'
+      })
     }
 
-    function calcActive(): number {
-      for (let i = SECTIONS.length - 1; i >= 0; i--) {
-        const el = document.getElementById(SECTIONS[i].id)
-        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) return i
-      }
-      return 0
+    function updateBirdColor(progress: number) {
+      const gold = progress >= 0.95
+      if (gold === birdGoldRef.current) return
+      birdGoldRef.current = gold
+      birdBubbleEl!.style.background = gold ? '#FFB72E' : '#0A4FCC'
+      birdBubbleEl!.style.boxShadow  = gold
+        ? '0 0 0 4px rgba(255,183,46,0.3), 0 2px 12px rgba(255,183,46,0.4)'
+        : '0 2px 8px rgba(0,0,0,0.2)'
     }
+
+    // ── Initial placement ─────────────────────────────────────────────────────
+
+    placeBird()
+    const init = computeCarPct(getScrollProgress())
+    placeCarAt(init.pct)
+    updateDots(init.pct, init.snappedIdx)
+
+    // ── Continuous bounces ────────────────────────────────────────────────────
+
+    const carBounceTween  = gsap.to(carBounceEl,  { y: -3, duration: 0.9, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+    const birdBounceTween = gsap.to(birdBounceEl, { y: -3, duration: 0.8, repeat: -1, yoyo: true, ease: 'sine.inOut' })
 
     // ── Scroll handler ────────────────────────────────────────────────────────
 
     const onScroll = () => {
-      // Query navbar's visual bottom on every frame — getBoundingClientRect reflects
-      // any translateY the navbar applies for its hide/show animation, so the rail
-      // and bird automatically follow without needing a separate MutationObserver
-      const hEl       = document.querySelector<HTMLElement>('header')
-      const navBottom = hEl ? hEl.getBoundingClientRect().bottom : 64
-      const railTop   = Math.max(0, navBottom - 14)
-      railEl.style.top = `${railTop}px`
-      birdEl.style.top = `${railTop - 2}px`
-
-      // Direct DOM update — no tween, so the bird feels scrubbed by scroll
-      const pct = getBirdPct(getProgress())
-      birdEl.style.left  = `${birdLeftPx(pct)}px`
-      fillEl.style.width = `${pct}%`
-
-      const newActive = calcActive()
-      if (newActive !== activeDotRef.current) {
-        activeDotRef.current = newActive
-        setActiveDot(newActive)
-      }
+      const progress            = getScrollProgress()
+      const { pct, snappedIdx } = computeCarPct(progress)
+      placeCarAt(pct)
+      updateDots(pct, snappedIdx)
+      updateBirdColor(progress)
     }
-
     window.addEventListener('scroll', onScroll, { passive: true })
 
     // ── Resize handler (debounced) ────────────────────────────────────────────
 
-    let resizeTimer: ReturnType<typeof setTimeout>
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined
     const onResize = () => {
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(() => {
-        measure()
-        const pct = getBirdPct(getProgress())
-        birdEl.style.left  = `${birdLeftPx(pct)}px`
-        fillEl.style.width = `${pct}%`
+        placeBird()
+        placeCarAt(carPctRef.current)
       }, 100)
     }
     window.addEventListener('resize', onResize)
 
-    // ── IntersectionObserver for download-banner ──────────────────────────────
+    // ── IntersectionObserver for confetti + fade ──────────────────────────────
 
     const bannerEl = document.getElementById('download-banner')
     let io: IntersectionObserver | null = null
@@ -146,19 +168,28 @@ export default function FerroScrollCompanion() {
       io = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
+            // Fire confetti exactly once
             if (!hasLandedRef.current) {
               hasLandedRef.current = true
-              const rect = bannerEl.getBoundingClientRect()
-              const originY = (rect.top + rect.height / 2) / window.innerHeight
               import('canvas-confetti').then(({ default: confetti }) => {
-                confetti({ particleCount: 120, spread: 80, origin: { x: 0.3, y: originY } })
-                confetti({ particleCount: 120, spread: 80, origin: { x: 0.7, y: originY } })
+                confetti({ particleCount: 120, spread: 80, origin: { x: 0.3, y: 0.5 } })
+                confetti({ particleCount: 120, spread: 80, origin: { x: 0.5, y: 0.5 } })
+                confetti({ particleCount: 120, spread: 80, origin: { x: 0.7, y: 0.5 } })
               })
             }
-            gsap.to(wrapperEl, { opacity: 0, duration: 0.6 })
+            // Fade component out after 1.5 s delay
+            if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
+            fadeTimerRef.current = setTimeout(() => {
+              gsap.to(wrapperEl, { opacity: 0, duration: 0.8 })
+            }, 1500)
           } else {
-            // top > 0: banner is below viewport — user scrolled back up past it → show rail
-            // top < 0: banner is above viewport — user scrolled down past it → stay hidden
+            // Banner has left the viewport
+            if (fadeTimerRef.current) {
+              clearTimeout(fadeTimerRef.current)
+              fadeTimerRef.current = null
+            }
+            // top > 0 → banner is below viewport (user scrolled back up) → show rail
+            // top < 0 → banner is above viewport (scrolled past) → keep hidden
             if (entry.boundingClientRect.top > 0) {
               gsap.to(wrapperEl, { opacity: 1, duration: 0.6 })
             }
@@ -172,7 +203,9 @@ export default function FerroScrollCompanion() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       clearTimeout(resizeTimer)
-      bounceTween.kill()
+      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
+      carBounceTween.kill()
+      birdBounceTween.kill()
       gsap.killTweensOf(wrapperEl)
       io?.disconnect()
     }
@@ -181,101 +214,122 @@ export default function FerroScrollCompanion() {
   if (reducedMotion) return null
 
   return (
-    // Full-viewport fixed wrapper — pointer-events none so nothing blocks the page
     <div
       ref={wrapperRef}
       style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 52 }}
     >
-      {/* Horizontal rail — positioned flush with the navbar's bottom border */}
+      {/* Vertical rail — 2 px wide, 45 vh tall, x = 40 px, top edge at 30 vh */}
       <div
-        ref={railRef}
-        style={{ position: 'absolute', top: 50, left: 0, right: 0, height: 28, transition: 'top 0.2s ease' }}
+        style={{
+          position: 'absolute',
+          left: 40,
+          top: '30vh',
+          transform: 'translateX(-50%)',
+          width: 2,
+          height: '45vh',
+        }}
       >
-        {/* Background gray line matching the navbar border tone */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: 0,
-            right: 0,
-            height: 1,
-            marginTop: '-0.5px',
-            background: '#E5E3DA',
-          }}
-        />
+        {/* SVG track: viewBox 0 0 2 100 — fill height in viewBox units = % */}
+        <svg
+          viewBox="0 0 2 100"
+          preserveAspectRatio="none"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+        >
+          <rect x="0" y="0" width="2" height="100" fill="#E5E3DA" />
+          <rect ref={fillRectRef} x="0" y="0" width="2" height="0" fill="#1E7BFF" />
+        </svg>
 
-        {/* Blue progress fill — grows left-to-right as the bird travels */}
-        <div
-          ref={fillRef}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: 0,
-            width: '5%',
-            height: 3,
-            marginTop: '-1.5px',
-            background: '#1E7BFF',
-          }}
-        />
-
-        {/* Section dots */}
-        {SECTIONS.map(({ id, Icon, label, pct }, i) => {
-          const isDownload = id === 'download-banner'
-          const primary    = isDownload ? '#FFB72E' : '#1E7BFF'
-          const tint       = isDownload ? '#FFF8E8' : '#E8F1FF'
-          const isActive   = activeDot === i
-          const isPassed   = activeDot > i
-          const size       = isActive ? 28 : 24
-
-          return (
-            <button
-              key={id}
-              aria-label={`Go to ${label}`}
-              onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
-              style={{
-                position: 'absolute',
-                left: `${pct}%`,
-                top: '50%',
-                transform: 'translateX(-50%) translateY(-50%)',
-                width: size,
-                height: size,
-                borderRadius: '50%',
-                background: isActive ? primary : isPassed ? tint : '#FFFFFF',
-                border: `2px solid ${isActive || isPassed ? primary : '#D3D1C7'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                padding: 0,
-                transition: 'background 0.25s, border-color 0.25s, width 0.25s, height 0.25s',
-                outline: 'none',
-              }}
-            >
-              <Icon
-                size={isActive ? 14 : 12}
-                style={{
-                  color: isActive ? '#FFFFFF' : isPassed ? primary : '#9CA3AF',
-                  transition: 'color 0.25s',
-                  display: 'block',
-                }}
-              />
-            </button>
-          )
-        })}
+        {/* Five section dots at 0 / 20 / 40 / 60 / 80 % of rail */}
+        {SECTIONS.map(({ id, railPct }, i) => (
+          <div
+            key={id}
+            ref={el => { dotRefs.current[i] = el }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Scroll to ${id.replace(/-/g, ' ')}`}
+            onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+              }
+            }}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: `${railPct}%`,
+              transform: 'translateX(-50%) translateY(-50%)',
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              background: '#D3D1C7',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              transition: 'background 0.25s, opacity 0.15s',
+            }}
+          />
+        ))}
       </div>
 
-      {/* Bird — position managed entirely via refs / GSAP */}
-      <div ref={birdRef} style={{ position: 'absolute', pointerEvents: 'none' }}>
-        {/* Inner bounce wrapper — GSAP y-bounce is isolated here */}
-        <div ref={birdBounceRef}>
+      {/* Car — top driven by JS every scroll frame, no CSS transition */}
+      <div
+        ref={carOuterRef}
+        style={{
+          position: 'absolute',
+          left: 40,
+          top: `${RAIL_TOP_FRAC * 100}vh`,
+          transform: 'translateX(-50%) translateY(-50%)',
+          pointerEvents: 'none',
+        }}
+      >
+        {/* Inner wrapper: GSAP y-bounce isolated here */}
+        <div ref={carBounceRef}>
           <img
-            src="/ferro-bird-2.png"
+            src={ferroCar}
             alt=""
             aria-hidden={true}
             draggable={false}
-            style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}
+            style={{ width: 60, display: 'block' }}
           />
+        </div>
+      </div>
+
+      {/* Bird bubble — static position at 100 % of rail (Download Banner) */}
+      <div
+        ref={birdOuterRef}
+        style={{
+          position: 'absolute',
+          left: 40,
+          top: `${RAIL_BOT_FRAC * 100}vh`,
+          transform: 'translateX(-50%) translateY(-50%)',
+          pointerEvents: 'none',
+        }}
+      >
+        <div
+          ref={birdBubbleRef}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: '#0A4FCC',
+            border: '3px solid white',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background 0.5s ease, box-shadow 0.5s ease',
+          }}
+        >
+          {/* Inner wrapper: GSAP y-bounce isolated here */}
+          <div ref={birdBounceRef}>
+            <img
+              src="/ferro-bird-2.png"
+              alt=""
+              aria-hidden={true}
+              draggable={false}
+              style={{ width: 26, display: 'block' }}
+            />
+          </div>
         </div>
       </div>
     </div>
