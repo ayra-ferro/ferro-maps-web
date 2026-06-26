@@ -1,14 +1,13 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card } from '@ferro-maps/ui'
-import { Car, Flame, Users, MessageSquare } from 'lucide-react'
+import { Car, Users, MessageSquare } from 'lucide-react'
+import { collection, query, where, onSnapshot } from 'firebase/firestore'
+import { db } from '../lib/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import AppShell from '../components/AppShell'
 import AdminMap from '../components/AdminMap'
 
-// Placeholder values — replace once real data sources are wired up
-const DRIVERS_ONLINE = 128
-const ACTIVE_HOTSPOTS = 14
-const TOTAL_DRIVERS = 1042
 const OPEN_TICKETS = 3
 const RECENT_TICKETS = [
   {
@@ -26,6 +25,22 @@ const RECENT_TICKETS = [
 export default function Dashboard() {
   const { signOut } = useAuth()
   const navigate = useNavigate()
+  const [driversOnline, setDriversOnline] = useState(0)
+  const [totalDrivers, setTotalDrivers] = useState(0)
+
+  useEffect(() => {
+    const onlineUnsub = onSnapshot(
+      query(collection(db, 'users'), where('isOnline', '==', true)),
+      (snap) => setDriversOnline(snap.size),
+    )
+    const totalUnsub = onSnapshot(collection(db, 'users'), (snap) =>
+      setTotalDrivers(snap.size),
+    )
+    return () => {
+      onlineUnsub()
+      totalUnsub()
+    }
+  }, [])
 
   async function handleSignOut() {
     await signOut()
@@ -36,24 +51,14 @@ export default function Dashboard() {
     <AppShell title="Dashboard">
       <div className="flex flex-col gap-6">
         {/* Stat cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card>
             <div className="flex flex-col gap-3">
               <div className="w-9 h-9 rounded-md bg-ferro-tint flex items-center justify-center">
                 <Car size={18} className="text-ferro-deep" />
               </div>
               <p className="text-label text-text-secondary">Drivers online</p>
-              <p className="text-2xl font-medium text-text-primary">{DRIVERS_ONLINE}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="flex flex-col gap-3">
-              <div className="w-9 h-9 rounded-md bg-amber-50 flex items-center justify-center">
-                <Flame size={18} className="text-amber-600" />
-              </div>
-              <p className="text-label text-text-secondary">Active hotspots</p>
-              <p className="text-2xl font-medium text-text-primary">{ACTIVE_HOTSPOTS}</p>
+              <p className="text-2xl font-medium text-text-primary">{driversOnline}</p>
             </div>
           </Card>
 
@@ -64,7 +69,7 @@ export default function Dashboard() {
               </div>
               <p className="text-label text-text-secondary">Total drivers</p>
               <p className="text-2xl font-medium text-text-primary">
-                {TOTAL_DRIVERS.toLocaleString()}
+                {totalDrivers.toLocaleString()}
               </p>
             </div>
           </Card>
