@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 import {
   LayoutDashboard,
   Car,
-  Flame,
   MessageSquare,
   Settings,
   ChevronLeft,
@@ -50,7 +49,6 @@ export default function AppShell({ children, title }: AppShellProps) {
   const navItems = [
     { label: 'Dashboard', to: '/dashboard', icon: <LayoutDashboard size={20} /> },
     { label: 'Drivers', to: '/drivers', icon: <Car size={20} /> },
-    { label: 'Hotspots', to: '/hotspots', icon: <Flame size={20} /> },
     {
       label: 'Messages',
       to: '/messages',
