@@ -5,6 +5,7 @@ import PublicOnlyRoute from './components/PublicOnlyRoute'
 import SignIn from './pages/SignIn'
 import CreateAccount from './pages/CreateAccount'
 import Dashboard from './pages/Dashboard'
+import Drivers from './pages/Drivers'
 import ComingSoon from './pages/ComingSoon'
 import Messages from './pages/Messages'
 
@@ -34,15 +35,7 @@ export default function App() {
             path="/drivers"
             element={
               <ProtectedRoute>
-                <ComingSoon label="Drivers" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/hotspots"
-            element={
-              <ProtectedRoute>
-                <ComingSoon label="Hotspots" />
+                <Drivers />
               </ProtectedRoute>
             }
           />
