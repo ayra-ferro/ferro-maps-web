@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { Button, Card } from '@ferro-maps/ui'
-import { Car, Flame, Users, MessageSquare, Map } from 'lucide-react'
+import { Car, Flame, Users, MessageSquare } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import AppShell from '../components/AppShell'
+import AdminMap from '../components/AdminMap'
 
 // Placeholder values — replace once real data sources are wired up
 const DRIVERS_ONLINE = 128
@@ -84,8 +85,8 @@ export default function Dashboard() {
           <div className="lg:col-span-3">
             <Card>
               <p className="text-label font-medium text-text-primary mb-4">Live driver map</p>
-              <div className="h-[200px] rounded-lg bg-neutral-100 flex items-center justify-center">
-                <Map size={36} className="text-neutral-300" />
+              <div className="h-64">
+                <AdminMap />
               </div>
             </Card>
           </div>
