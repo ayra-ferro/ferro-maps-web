@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api'
 import { MapPin } from 'lucide-react'
-import { collection, query, where, onSnapshot, GeoPoint, Timestamp } from 'firebase/firestore'
+import { collection, onSnapshot, GeoPoint, Timestamp } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { useDriverFilters } from '../hooks/useDriverFilters'
+import type { ZoneFilter } from '../hooks/useDriverFilters'
 
 const LONDON_CENTER = { lat: 51.5074, lng: -0.1278 }
 
@@ -25,12 +27,23 @@ const MARKER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#1E7BFF"/></svg>'
 )}`
 
+const STATUS_PILLS = [
+  { value: 'all', label: 'All' },
+  { value: 'online', label: 'Online' },
+  { value: 'offline', label: 'Offline' },
+  { value: 'suspended', label: 'Suspended' },
+] as const
+
+const ZONE_OPTIONS: ZoneFilter[] = ['all', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6']
+
 interface Driver {
   uid: string
   name: string
   lat: number
   lng: number
   locationUpdatedAt: Timestamp | null
+  isOnline: boolean
+  isSuspended: boolean
 }
 
 function formatRelativeTime(ts: Timestamp | null): string {
@@ -47,22 +60,26 @@ export default function AdminMap() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [selectedUid, setSelectedUid] = useState<string | null>(null)
 
+  const { statusFilter, setStatusFilter, zoneFilter, setZoneFilter, filteredDrivers } =
+    useDriverFilters(drivers)
+
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('isOnline', '==', true))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const online: Driver[] = []
+    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const all: Driver[] = []
       snapshot.forEach((doc) => {
         const data = doc.data()
         if (!(data.location instanceof GeoPoint)) return
-        online.push({
+        all.push({
           uid: data.uid ?? doc.id,
           name: data.name ?? 'Unknown',
           lat: data.location.latitude,
           lng: data.location.longitude,
           locationUpdatedAt: data.locationUpdatedAt ?? null,
+          isOnline: data.isOnline ?? false,
+          isSuspended: data.isSuspended ?? false,
         })
       })
-      setDrivers(online)
+      setDrivers(all)
     })
     return unsubscribe
   }, [])
@@ -79,65 +96,112 @@ export default function AdminMap() {
     )
   }
 
+  const count = filteredDrivers.length
+  const driverWord = count === 1 ? 'driver' : 'drivers'
+  const statusLabel =
+    statusFilter === 'all' ? '' : ` ${statusFilter}`
+
   return (
-    <div className="w-full h-full rounded-card overflow-hidden relative">
-      <div className="absolute top-3 left-3 z-10">
-        {drivers.length > 0 ? (
-          <span className="bg-white text-ferro-primary text-xs font-medium px-2 py-1 rounded-full shadow-sm">
-            {drivers.length} {drivers.length === 1 ? 'driver' : 'drivers'} online
-          </span>
-        ) : (
-          <span className="bg-white text-text-tertiary text-xs px-2 py-1 rounded-full shadow-sm">
-            No drivers online
-          </span>
-        )}
-      </div>
-      <LoadScript googleMapsApiKey={apiKey} loadingElement={LOADING_ELEMENT}>
-        <GoogleMap
-          mapContainerStyle={MAP_CONTAINER_STYLE}
-          center={LONDON_CENTER}
-          zoom={11}
-          options={MAP_OPTIONS}
-          onClick={() => setSelectedUid(null)}
+    <div className="w-full h-full flex flex-col rounded-card overflow-hidden">
+      {/* Filter bar */}
+      <div className="bg-white px-3 py-2 border-b border-gray-200 flex flex-wrap items-center gap-2 flex-shrink-0">
+        <div className="flex gap-1">
+          {STATUS_PILLS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => setStatusFilter(value)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                statusFilter === value
+                  ? 'bg-ferro-primary text-white border-ferro-primary'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <select
+          value={zoneFilter}
+          onChange={(e) => setZoneFilter(e.target.value as ZoneFilter)}
+          className="px-2 py-1 text-xs rounded border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-ferro-primary focus:ring-offset-1"
         >
-          {drivers.map((driver) => {
-            const firstName = driver.name.split(' ')[0]
-            return (
-              <Marker
-                key={driver.uid}
-                position={{ lat: driver.lat, lng: driver.lng }}
-                label={{
-                  text: firstName,
-                  color: 'white',
-                  fontWeight: '600',
-                  fontSize: '11px',
-                }}
-                icon={{
-                  url: MARKER_SVG,
-                  scaledSize: new google.maps.Size(36, 36),
-                  anchor: new google.maps.Point(18, 18),
-                }}
-                onClick={() => setSelectedUid(driver.uid)}
-              >
-                {selectedUid === driver.uid && (
-                  <InfoWindow onCloseClick={() => setSelectedUid(null)}>
-                    <div style={{ padding: '4px 2px' }}>
-                      <p style={{ fontWeight: 600, fontSize: '13px', margin: 0 }}>{driver.name}</p>
-                      <p style={{ color: '#16a34a', fontSize: '12px', margin: '2px 0 0' }}>Online</p>
-                      <p style={{ color: '#9ca3af', fontSize: '11px', margin: '2px 0 0' }}>
-                        {formatRelativeTime(driver.locationUpdatedAt)}
-                      </p>
-                    </div>
-                  </InfoWindow>
-                )}
-              </Marker>
-            )
-          })}
-        </GoogleMap>
-      </LoadScript>
+          {ZONE_OPTIONS.map((z) => (
+            <option key={z} value={z}>
+              {z === 'all' ? 'All Zones' : z}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Map */}
+      <div className="relative flex-1">
+        <div className="absolute top-3 left-3 z-10">
+          {count > 0 ? (
+            <span className="bg-white text-ferro-primary text-xs font-medium px-2 py-1 rounded-full shadow-sm">
+              {count} {driverWord}{statusLabel}
+            </span>
+          ) : (
+            <span className="bg-white text-text-tertiary text-xs px-2 py-1 rounded-full shadow-sm">
+              No drivers shown
+            </span>
+          )}
+        </div>
+        <LoadScript googleMapsApiKey={apiKey} loadingElement={LOADING_ELEMENT}>
+          <GoogleMap
+            mapContainerStyle={MAP_CONTAINER_STYLE}
+            center={LONDON_CENTER}
+            zoom={11}
+            options={MAP_OPTIONS}
+            onClick={() => setSelectedUid(null)}
+          >
+            {filteredDrivers.map((driver) => {
+              const firstName = driver.name.split(' ')[0]
+              return (
+                <Marker
+                  key={driver.uid}
+                  position={{ lat: driver.lat, lng: driver.lng }}
+                  label={{
+                    text: firstName,
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: '11px',
+                  }}
+                  icon={{
+                    url: MARKER_SVG,
+                    scaledSize: new google.maps.Size(36, 36),
+                    anchor: new google.maps.Point(18, 18),
+                  }}
+                  onClick={() => setSelectedUid(driver.uid)}
+                >
+                  {selectedUid === driver.uid && (
+                    <InfoWindow onCloseClick={() => setSelectedUid(null)}>
+                      <div style={{ padding: '4px 2px' }}>
+                        <p style={{ fontWeight: 600, fontSize: '13px', margin: 0 }}>{driver.name}</p>
+                        <p
+                          style={{
+                            color: driver.isSuspended
+                              ? '#dc2626'
+                              : driver.isOnline
+                                ? '#16a34a'
+                                : '#6b7280',
+                            fontSize: '12px',
+                            margin: '2px 0 0',
+                          }}
+                        >
+                          {driver.isSuspended ? 'Suspended' : driver.isOnline ? 'Online' : 'Offline'}
+                        </p>
+                        <p style={{ color: '#9ca3af', fontSize: '11px', margin: '2px 0 0' }}>
+                          {formatRelativeTime(driver.locationUpdatedAt)}
+                        </p>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </Marker>
+              )
+            })}
+          </GoogleMap>
+        </LoadScript>
+      </div>
     </div>
   )
 }
-
-// FM-WEB-044 complete: real-time driver markers from Firestore
-// Next: FR-ADMIN-02 driver management table (FM-WEB-045)
