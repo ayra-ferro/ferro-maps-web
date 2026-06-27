@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
+import React, { useState, useEffect } from 'react'
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { MapPin } from 'lucide-react'
 import { collection, onSnapshot, GeoPoint } from 'firebase/firestore'
 import { db } from '../lib/firebase'
@@ -20,11 +20,6 @@ const MAP_OPTIONS: google.maps.MapOptions = {
   mapTypeControl: false,
 }
 
-const LOADING_ELEMENT = (
-  <div className="w-full h-full flex items-center justify-center">
-    <span className="text-body text-ferro-primary">Loading map...</span>
-  </div>
-)
 
 const MARKER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#1E7BFF"/></svg>'
@@ -44,8 +39,14 @@ interface Driver extends DriverDetail {
   lng: number
 }
 
-export default function AdminMap() {
+function AdminMap() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'ferro-maps-admin-script',
+    googleMapsApiKey: apiKey ?? '',
+  })
+
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [selectedUid, setSelectedUid] = useState<string | null>(null)
 
@@ -53,27 +54,32 @@ export default function AdminMap() {
     useDriverFilters(drivers)
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
-      const all: Driver[] = []
-      snapshot.forEach((doc) => {
-        const data = doc.data()
-        if (!(data.location instanceof GeoPoint)) return
-        all.push({
-          uid: data.uid ?? doc.id,
-          name: data.name ?? 'Unknown',
-          email: data.email ?? '',
-          phoneNumber: data.phoneNumber ?? '',
-          ferroBalance: typeof data.ferroBalance === 'number' ? data.ferroBalance : 0,
-          country: data.country ?? '',
-          lat: data.location.latitude,
-          lng: data.location.longitude,
-          locationUpdatedAt: data.locationUpdatedAt ?? null,
-          isOnline: data.isOnline ?? false,
-          isSuspended: data.isSuspended ?? false,
+    const unsubscribe = onSnapshot(
+      collection(db, 'users'),
+      (snapshot) => {
+        const all: Driver[] = []
+        snapshot.forEach((doc) => {
+          const data = doc.data()
+          if (!(data.location instanceof GeoPoint)) return
+          all.push({
+            uid: data.uid ?? doc.id,
+            name: data.name ?? 'Unknown',
+            email: data.email ?? '',
+            phoneNumber: data.phoneNumber ?? '',
+            ferroBalance: typeof data.ferroBalance === 'number' ? data.ferroBalance : 0,
+            country: data.country ?? '',
+            lat: data.location.latitude,
+            lng: data.location.longitude,
+            locationUpdatedAt: data.locationUpdatedAt ?? null,
+            isOnline: data.isOnline ?? false,
+            isSuspended: data.isSuspended ?? false,
+          })
         })
-      })
-      setDrivers(all)
-    })
+        console.log('Drivers loaded:', all.length)
+        setDrivers(all)
+      },
+      (error) => console.error('Firestore snapshot error:', error),
+    )
     return unsubscribe
   }, [])
 
@@ -142,7 +148,18 @@ export default function AdminMap() {
             </span>
           )}
         </div>
-        <LoadScript googleMapsApiKey={apiKey} loadingElement={LOADING_ELEMENT}>
+        {loadError ? (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-4">
+            <MapPin size={32} className="text-neutral-300" />
+            <p className="text-body-sm text-text-tertiary text-center">
+              Failed to load Google Maps — check your API key and network connection.
+            </p>
+          </div>
+        ) : !isLoaded ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-body text-ferro-primary">Loading map...</span>
+          </div>
+        ) : (
           <GoogleMap
             mapContainerStyle={MAP_CONTAINER_STYLE}
             center={LONDON_CENTER}
@@ -172,10 +189,12 @@ export default function AdminMap() {
               )
             })}
           </GoogleMap>
-        </LoadScript>
+        )}
       </div>
 
       <DriverDrawer driver={selectedDriver} onClose={() => setSelectedUid(null)} />
     </>
   )
 }
+
+export default React.memo(AdminMap)
