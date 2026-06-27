@@ -167,34 +167,36 @@ function AdminMap() {
             options={MAP_OPTIONS}
             onClick={() => setSelectedUid(null)}
           >
-            <MarkerClusterer>
+            <MarkerClusterer
+              options={{
+                zoomOnClick: true,
+                maxZoom: 15,
+              }}
+            >
               {(clusterer) => (
-                <>
-                  {filteredDrivers.map((driver) => {
-                    const firstName = driver.name.split(' ')[0]
-                    return (
-                      <Marker
-                        key={driver.uid}
-                        position={{ lat: driver.lat, lng: driver.lng }}
-                        clusterer={clusterer}
-                        title={driver.name}
-                        label={{
-                          text: firstName,
-                          color: 'white',
-                          fontWeight: '600',
-                          fontSize: '11px',
-                          fontFamily: 'Nunito, sans-serif',
-                        }}
-                        icon={{
-                          url: MARKER_SVG,
-                          scaledSize: new window.google.maps.Size(44, 44),
-                          anchor: new window.google.maps.Point(22, 22),
-                        }}
-                        onClick={() => setSelectedUid(driver.uid)}
-                      />
-                    )
-                  })}
-                </>
+                <div>
+                  {filteredDrivers.map((driver) => (
+                    <Marker
+                      key={driver.uid}
+                      clusterer={clusterer}
+                      position={{ lat: driver.lat, lng: driver.lng }}
+                      title={driver.name}
+                      label={{
+                        text: driver.name.split(' ')[0],
+                        color: 'white',
+                        fontWeight: '600',
+                        fontSize: '11px',
+                        fontFamily: 'Nunito, sans-serif',
+                      }}
+                      icon={{
+                        url: MARKER_SVG,
+                        scaledSize: new window.google.maps.Size(44, 44),
+                        anchor: new window.google.maps.Point(22, 22),
+                      }}
+                      onClick={() => setSelectedUid(driver.uid)}
+                    />
+                  ))}
+                </div>
               )}
             </MarkerClusterer>
           </GoogleMap>
