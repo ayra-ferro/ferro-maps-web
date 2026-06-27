@@ -116,7 +116,7 @@ export default function Dashboard() {
           <div className="lg:col-span-3">
             <Card>
               <p className="text-label font-medium text-text-primary mb-4">Live driver map</p>
-              <div className="h-64">
+              <div className="flex flex-col h-80">
                 <AdminMap />
               </div>
             </Card>
