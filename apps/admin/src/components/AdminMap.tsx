@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react'
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api'
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
 import { MapPin } from 'lucide-react'
-import { collection, onSnapshot, GeoPoint, Timestamp } from 'firebase/firestore'
+import { collection, onSnapshot, GeoPoint } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useDriverFilters } from '../hooks/useDriverFilters'
 import type { ZoneFilter } from '../hooks/useDriverFilters'
+import DriverDrawer from './DriverDrawer'
+import type { DriverDetail } from './DriverDrawer'
 
 const LONDON_CENTER = { lat: 51.5074, lng: -0.1278 }
 
 const MAP_CONTAINER_STYLE = { width: '100%', height: '100%' }
 
 const MAP_OPTIONS: google.maps.MapOptions = {
+  disableDefaultUI: false,
   zoomControl: true,
+  fullscreenControl: true,
   streetViewControl: false,
   mapTypeControl: false,
-  fullscreenControl: true,
 }
 
 const LOADING_ELEMENT = (
@@ -36,23 +39,9 @@ const STATUS_PILLS = [
 
 const ZONE_OPTIONS: ZoneFilter[] = ['all', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6']
 
-interface Driver {
-  uid: string
-  name: string
+interface Driver extends DriverDetail {
   lat: number
   lng: number
-  locationUpdatedAt: Timestamp | null
-  isOnline: boolean
-  isSuspended: boolean
-}
-
-function formatRelativeTime(ts: Timestamp | null): string {
-  if (!ts) return 'Unknown'
-  const diffSec = Math.floor((Date.now() - ts.toMillis()) / 1000)
-  if (diffSec < 60) return `Updated ${diffSec}s ago`
-  const diffMin = Math.floor(diffSec / 60)
-  if (diffMin < 60) return `Updated ${diffMin} min ago`
-  return `Updated ${Math.floor(diffMin / 60)}h ago`
 }
 
 export default function AdminMap() {
@@ -72,6 +61,10 @@ export default function AdminMap() {
         all.push({
           uid: data.uid ?? doc.id,
           name: data.name ?? 'Unknown',
+          email: data.email ?? '',
+          phoneNumber: data.phoneNumber ?? '',
+          ferroBalance: typeof data.ferroBalance === 'number' ? data.ferroBalance : 0,
+          country: data.country ?? '',
           lat: data.location.latitude,
           lng: data.location.longitude,
           locationUpdatedAt: data.locationUpdatedAt ?? null,
@@ -98,12 +91,15 @@ export default function AdminMap() {
 
   const count = filteredDrivers.length
   const driverWord = count === 1 ? 'driver' : 'drivers'
-  const statusLabel =
-    statusFilter === 'all' ? '' : ` ${statusFilter}`
+  const statusLabel = statusFilter === 'all' ? '' : ` ${statusFilter}`
+
+  const selectedDriver = selectedUid
+    ? (drivers.find((d) => d.uid === selectedUid) ?? null)
+    : null
 
   return (
-    <div className="w-full h-full flex flex-col rounded-card overflow-hidden">
-      {/* Filter bar */}
+    <>
+      {/* Filter bar — outside the map container */}
       <div className="bg-white px-3 py-2 border-b border-gray-200 flex flex-wrap items-center gap-2 flex-shrink-0">
         <div className="flex gap-1">
           {STATUS_PILLS.map(({ value, label }) => (
@@ -133,8 +129,8 @@ export default function AdminMap() {
         </select>
       </div>
 
-      {/* Map */}
-      <div className="relative flex-1">
+      {/* Map container — fills remaining height */}
+      <div className="relative flex-1 w-full rounded-card overflow-hidden">
         <div className="absolute top-3 left-3 z-10">
           {count > 0 ? (
             <span className="bg-white text-ferro-primary text-xs font-medium px-2 py-1 rounded-full shadow-sm">
@@ -172,36 +168,14 @@ export default function AdminMap() {
                     anchor: new google.maps.Point(18, 18),
                   }}
                   onClick={() => setSelectedUid(driver.uid)}
-                >
-                  {selectedUid === driver.uid && (
-                    <InfoWindow onCloseClick={() => setSelectedUid(null)}>
-                      <div style={{ padding: '4px 2px' }}>
-                        <p style={{ fontWeight: 600, fontSize: '13px', margin: 0 }}>{driver.name}</p>
-                        <p
-                          style={{
-                            color: driver.isSuspended
-                              ? '#dc2626'
-                              : driver.isOnline
-                                ? '#16a34a'
-                                : '#6b7280',
-                            fontSize: '12px',
-                            margin: '2px 0 0',
-                          }}
-                        >
-                          {driver.isSuspended ? 'Suspended' : driver.isOnline ? 'Online' : 'Offline'}
-                        </p>
-                        <p style={{ color: '#9ca3af', fontSize: '11px', margin: '2px 0 0' }}>
-                          {formatRelativeTime(driver.locationUpdatedAt)}
-                        </p>
-                      </div>
-                    </InfoWindow>
-                  )}
-                </Marker>
+                />
               )
             })}
           </GoogleMap>
         </LoadScript>
       </div>
-    </div>
+
+      <DriverDrawer driver={selectedDriver} onClose={() => setSelectedUid(null)} />
+    </>
   )
 }
