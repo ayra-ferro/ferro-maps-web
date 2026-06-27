@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
+import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer } from '@react-google-maps/api'
 import { MapPin } from 'lucide-react'
 import { collection, onSnapshot, GeoPoint } from 'firebase/firestore'
 import { db } from '../lib/firebase'
@@ -167,29 +167,36 @@ function AdminMap() {
             options={MAP_OPTIONS}
             onClick={() => setSelectedUid(null)}
           >
-            {filteredDrivers.map((driver) => {
-              const firstName = driver.name.split(' ')[0]
-              return (
-                <Marker
-                  key={driver.uid}
-                  position={{ lat: driver.lat, lng: driver.lng }}
-                  title={driver.name}
-                  label={{
-                    text: firstName,
-                    color: 'white',
-                    fontWeight: '600',
-                    fontSize: '11px',
-                    fontFamily: 'Nunito, sans-serif',
-                  }}
-                  icon={{
-                    url: MARKER_SVG,
-                    scaledSize: new window.google.maps.Size(44, 44),
-                    anchor: new window.google.maps.Point(22, 22),
-                  }}
-                  onClick={() => setSelectedUid(driver.uid)}
-                />
-              )
-            })}
+            <MarkerClusterer>
+              {(clusterer) => (
+                <>
+                  {filteredDrivers.map((driver) => {
+                    const firstName = driver.name.split(' ')[0]
+                    return (
+                      <Marker
+                        key={driver.uid}
+                        position={{ lat: driver.lat, lng: driver.lng }}
+                        clusterer={clusterer}
+                        title={driver.name}
+                        label={{
+                          text: firstName,
+                          color: 'white',
+                          fontWeight: '600',
+                          fontSize: '11px',
+                          fontFamily: 'Nunito, sans-serif',
+                        }}
+                        icon={{
+                          url: MARKER_SVG,
+                          scaledSize: new window.google.maps.Size(44, 44),
+                          anchor: new window.google.maps.Point(22, 22),
+                        }}
+                        onClick={() => setSelectedUid(driver.uid)}
+                      />
+                    )
+                  })}
+                </>
+              )}
+            </MarkerClusterer>
           </GoogleMap>
         )}
       </div>
