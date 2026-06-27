@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore'
+import { collection, onSnapshot, doc, updateDoc, GeoPoint } from 'firebase/firestore'
 import { MoreHorizontal } from 'lucide-react'
 import { Input, Badge } from '@ferro-maps/ui'
 import { db } from '../lib/firebase'
 import AppShell from '../components/AppShell'
+import { useDriverFilters } from '../hooks/useDriverFilters'
+import type { ZoneFilter } from '../hooks/useDriverFilters'
 
 interface DriverDoc {
   uid: string
@@ -14,9 +16,11 @@ interface DriverDoc {
   ferroBalance: number
   country: string
   isSuspended: boolean
+  lat?: number
+  lng?: number
 }
 
-type StatusFilter = 'All' | 'Online' | 'Offline' | 'Suspended'
+const ZONE_OPTIONS: ZoneFilter[] = ['all', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6']
 
 const AVATAR_COLORS = [
   'bg-violet-500',
@@ -47,9 +51,11 @@ export default function Drivers() {
   const [drivers, setDrivers] = useState<DriverDoc[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
   const [suspendingUid, setSuspendingUid] = useState<string | null>(null)
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null)
+
+  const { statusFilter, setStatusFilter, zoneFilter, setZoneFilter, filteredDrivers } =
+    useDriverFilters(drivers)
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -65,6 +71,8 @@ export default function Drivers() {
           ferroBalance: typeof d.ferroBalance === 'number' ? d.ferroBalance : 0,
           country: d.country ?? '',
           isSuspended: d.isSuspended ?? false,
+          lat: d.location instanceof GeoPoint ? d.location.latitude : undefined,
+          lng: d.location instanceof GeoPoint ? d.location.longitude : undefined,
         })
       })
       setDrivers(list)
@@ -80,19 +88,14 @@ export default function Drivers() {
     return () => document.removeEventListener('click', close)
   }, [openMenuUid])
 
-  const filtered = drivers.filter((d) => {
+  const filtered = filteredDrivers.filter((d) => {
     const q = search.toLowerCase()
-    const matchesSearch =
+    return (
       !q ||
       d.name.toLowerCase().includes(q) ||
       d.email.toLowerCase().includes(q) ||
       d.phoneNumber.includes(q)
-    const matchesStatus =
-      statusFilter === 'All' ||
-      (statusFilter === 'Suspended' && d.isSuspended) ||
-      (statusFilter === 'Online' && d.isOnline && !d.isSuspended) ||
-      (statusFilter === 'Offline' && !d.isOnline && !d.isSuspended)
-    return matchesSearch && matchesStatus
+    )
   })
 
   async function handleSuspendToggle(driver: DriverDoc) {
@@ -119,11 +122,24 @@ export default function Drivers() {
           </div>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+            onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
             className="px-3 py-2 text-sm rounded-button border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-ferro-primary focus:ring-offset-2"
           >
-            {(['All', 'Online', 'Offline', 'Suspended'] as const).map((s) => (
-              <option key={s}>{s}</option>
+            {(['all', 'online', 'offline', 'suspended'] as const).map((s) => (
+              <option key={s} value={s}>
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={zoneFilter}
+            onChange={(e) => setZoneFilter(e.target.value as ZoneFilter)}
+            className="px-3 py-2 text-sm rounded-button border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-ferro-primary focus:ring-offset-2"
+          >
+            {ZONE_OPTIONS.map((z) => (
+              <option key={z} value={z}>
+                {z === 'all' ? 'All Zones' : z}
+              </option>
             ))}
           </select>
           <p className="text-sm text-text-secondary whitespace-nowrap">
