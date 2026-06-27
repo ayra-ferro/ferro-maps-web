@@ -22,7 +22,7 @@ const MAP_OPTIONS: google.maps.MapOptions = {
 
 
 const MARKER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#1E7BFF"/></svg>'
+  '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><circle cx="22" cy="22" r="22" fill="#1E7BFF"/></svg>'
 )}`
 
 const STATUS_PILLS = [
@@ -173,16 +173,18 @@ function AdminMap() {
                 <Marker
                   key={driver.uid}
                   position={{ lat: driver.lat, lng: driver.lng }}
+                  title={driver.name}
                   label={{
                     text: firstName,
                     color: 'white',
                     fontWeight: '600',
                     fontSize: '11px',
+                    fontFamily: 'Nunito, sans-serif',
                   }}
                   icon={{
                     url: MARKER_SVG,
-                    scaledSize: new google.maps.Size(36, 36),
-                    anchor: new google.maps.Point(18, 18),
+                    scaledSize: new window.google.maps.Size(44, 44),
+                    anchor: new window.google.maps.Point(22, 22),
                   }}
                   onClick={() => setSelectedUid(driver.uid)}
                 />
