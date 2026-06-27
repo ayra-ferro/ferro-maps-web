@@ -170,7 +170,7 @@ function AdminMap() {
             <MarkerClusterer
               options={{
                 zoomOnClick: true,
-                maxZoom: 15,
+                maxZoom: 19,
               }}
             >
               {(clusterer) => (
