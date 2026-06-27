@@ -219,6 +219,9 @@ importers:
       '@fontsource/nunito':
         specifier: ^5.2.5
         version: 5.2.7
+      '@googlemaps/markerclusterer':
+        specifier: ^2.5.3
+        version: 2.5.3
       '@react-google-maps/api':
         specifier: ^2.20.8
         version: 2.20.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
