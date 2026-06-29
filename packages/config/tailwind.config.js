@@ -5,12 +5,16 @@ export default {
     extend: {
       colors: {
         // Primitive brand tokens
-        "ferro-primary": "#1E7BFF",
-        "ferro-deep": "#0A4FCC",
+        "ferro-primary": "#0E9BF7",
+        "ferro-deep": "#1A2A4A",
         "ferro-sky": "#5BA8FF",
         "ferro-tint": "#E8F1FF",
         "ferro-ink": "#000000",
         "ferro-signal": "#FFB72E",
+        "ferro-grey-border": "#CBD5E1",
+        "ferro-grey-text": "#94A3B8",
+        "ferro-input-bg": "rgba(203,213,225,0.10)",
+        "ferro-details-bg": "rgba(203,213,225,0.35)",
 
         // Primitive neutral tokens
         "neutral-50": "#F7F9FC",
@@ -34,7 +38,7 @@ export default {
         "surface-sunken": "#EEF2F8",
         "surface-inverse": "#0F1626",
         "surface-brand-subtle": "#E8F1FF",
-        "surface-brand": "#1E7BFF",
+        "surface-brand": "#0E9BF7",
 
         // Semantic text tokens
         "text-primary": "#0F1626",
@@ -42,19 +46,19 @@ export default {
         "text-tertiary": "#6B7892",
         "text-disabled": "#C2CDDC",
         "text-inverse": "#FFFFFF",
-        "text-brand": "#1E7BFF",
+        "text-brand": "#0E9BF7",
         "text-on-brand": "#FFFFFF",
 
         // Semantic border tokens
         "border-subtle": "#EEF2F8",
         "border-default": "#DDE4EF",
         "border-strong": "#C2CDDC",
-        "border-brand": "#1E7BFF",
+        "border-brand": "#0E9BF7",
 
         // Semantic action tokens
-        "action-primary": "#1E7BFF",
-        "action-primary-hover": "#0A4FCC",
-        "action-primary-pressed": "#0A4FCC",
+        "action-primary": "#0E9BF7",
+        "action-primary-hover": "#1A2A4A",
+        "action-primary-pressed": "#1A2A4A",
         "action-primary-disabled": "#C2CDDC",
         "action-secondary": "#E8F1FF",
         "action-secondary-hover": "#D6E5FF",
@@ -64,18 +68,18 @@ export default {
         "status-success": "#1FA971",
         "status-warning": "#FFB72E",
         "status-danger": "#E5364A",
-        "status-info": "#1E7BFF",
+        "status-info": "#0E9BF7",
 
         // Map-specific tokens
-        "map-pin-default": "#1E7BFF",
-        "map-pin-selected": "#0A4FCC",
-        "map-route-active": "#1E7BFF",
+        "map-pin-default": "#0E9BF7",
+        "map-pin-selected": "#1A2A4A",
+        "map-route-active": "#0E9BF7",
         "map-route-alternate": "#C2CDDC",
-        "map-user-location": "#1E7BFF",
+        "map-user-location": "#0E9BF7",
 
         // Tier tokens
         "tier-good": "#5BA8FF",
-        "tier-great": "#1E7BFF",
+        "tier-great": "#0E9BF7",
         "tier-flawless": "#FFB72E",
       },
       fontFamily: {
@@ -109,7 +113,7 @@ export default {
         xl: "16px",
         "2xl": "24px",
         full: "9999px",
-        button: "8px",
+        button: "30px",
         card: "12px",
         sheet: "16px",
       },
