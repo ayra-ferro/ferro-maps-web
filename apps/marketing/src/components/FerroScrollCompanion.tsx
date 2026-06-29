@@ -28,7 +28,6 @@ export default function FerroScrollCompanion() {
   const birdBounceRef = useRef<HTMLDivElement>(null)
   const dotRefs       = useRef<(HTMLDivElement | null)[]>([])
 
-  const hasLandedRef = useRef(false)
   const birdGoldRef  = useRef(false)
   const carPctRef    = useRef(0)
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -168,9 +167,10 @@ export default function FerroScrollCompanion() {
       io = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            // Fire confetti exactly once
-            if (!hasLandedRef.current) {
-              hasLandedRef.current = true
+            // Only fire confetti when scrolling DOWN into the banner
+            // entry.boundingClientRect.top < 0 means banner entered from above (scrolled up) — skip
+            // entry.boundingClientRect.top >= 0 means banner entered from below (scrolled down) — fire
+            if (entry.boundingClientRect.top >= 0) {
               import('canvas-confetti').then(({ default: confetti }) => {
                 confetti({ particleCount: 120, spread: 80, origin: { x: 0.3, y: 0.5 } })
                 confetti({ particleCount: 120, spread: 80, origin: { x: 0.5, y: 0.5 } })
