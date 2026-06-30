@@ -3,9 +3,18 @@ import {
   onDocumentCreated,
   onDocumentUpdated,
 } from "firebase-functions/v2/firestore";
+import {onRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import sgMail from "@sendgrid/mail";
+import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import {initializeApp, getApps} from "firebase-admin/app";
+import busboy from "busboy";
+
+if (getApps().length === 0) {
+  initializeApp();
+}
+const db = getFirestore();
 
 const sendgridApiKey = defineSecret("SENDGRID_API_KEY");
 
@@ -45,6 +54,7 @@ export const onNewTicket = onDocumentCreated(
     try {
       await sgMail.send({
         from: {email: FROM_EMAIL, name: FROM_NAME},
+        replyTo: `ticket-${ticketNumber}@reply.ferromaps.com`,
         to: email,
         subject: `Thank you for contacting us (${formattedTicket})`,
         text: [
@@ -137,6 +147,7 @@ export const onTicketUpdated = onDocumentUpdated(
       try {
         await sgMail.send({
           from: {email: FROM_EMAIL, name: FROM_NAME},
+          replyTo: `ticket-${afterData.ticketNumber}@reply.ferromaps.com`,
           to: email,
           subject: `New reply to your ticket (${formattedTicket})`,
           text: [
@@ -169,6 +180,7 @@ export const onTicketUpdated = onDocumentUpdated(
       try {
         await sgMail.send({
           from: {email: FROM_EMAIL, name: FROM_NAME},
+          replyTo: `ticket-${afterData.ticketNumber}@reply.ferromaps.com`,
           to: email,
           subject: `Your ticket (${formattedTicket}) has been closed`,
           text: [
@@ -192,6 +204,81 @@ export const onTicketUpdated = onDocumentUpdated(
       } catch (err) {
         logger.error(`onTicketUpdated: failed to send closed notification to ${email}`, err);
       }
+    }
+  }
+);
+
+export const onInboundEmail = onRequest(
+  {region: "europe-west2"},
+  async (req, res) => {
+    try {
+      if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+      }
+
+      // Parse multipart form data from SendGrid Inbound Parse
+      const bb = busboy({headers: req.headers});
+      const fields: Record<string, string> = {};
+
+      await new Promise<void>((resolve, reject) => {
+        bb.on("field", (name, value) => {
+          fields[name] = value;
+        });
+        bb.on("close", resolve);
+        bb.on("error", reject);
+        bb.end(req.rawBody);
+      });
+
+      // SendGrid Inbound Parse provides 'to', 'from', 'subject', 'text' fields
+      const toAddress = fields["to"] || "";
+      const bodyText = fields["text"] || "";
+
+      // Extract ticket number from the 'to' address, e.g. ticket-49779@reply.ferromaps.com
+      const match = toAddress.match(/ticket-(\d+)@/);
+      if (!match) {
+        logger.warn("onInboundEmail: could not extract ticket number from", toAddress);
+        res.status(200).send("OK"); // Always 200 so SendGrid doesn't retry
+        return;
+      }
+
+      const ticketNumber = Number(match[1]);
+
+      // Find the ticket document by ticketNumber field
+      const snapshot = await db
+        .collection("supportRequests")
+        .where("ticketNumber", "==", ticketNumber)
+        .limit(1)
+        .get();
+
+      if (snapshot.empty) {
+        logger.warn("onInboundEmail: no ticket found for number", ticketNumber);
+        res.status(200).send("OK");
+        return;
+      }
+
+      const ticketDoc = snapshot.docs[0];
+
+      // Strip common quoted-reply patterns (basic heuristic - keeps only text
+      // before the first quoted-reply marker)
+      const cleanedText = bodyText
+        .split(/\nOn .+ wrote:\n/)[0]
+        .split(/\n-----Original Message-----/)[0]
+        .trim();
+
+      await ticketDoc.ref.update({
+        replies: FieldValue.arrayUnion({
+          text: cleanedText || bodyText.trim(),
+          sentAt: new Date(),
+          sentBy: "driver",
+        }),
+      });
+
+      logger.info(`onInboundEmail: appended driver reply to ticket #${ticketNumber}`);
+      res.status(200).send("OK");
+    } catch (error) {
+      logger.error("onInboundEmail: failed to process inbound email", error);
+      res.status(200).send("OK"); // Still 200 to prevent SendGrid retry storms
     }
   }
 );
