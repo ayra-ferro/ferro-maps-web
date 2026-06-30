@@ -1,3 +1,9 @@
+import ferroBirdCrow from './assets/avatars/ferro-bird-crow.png'
+import ferroBirdDetective from './assets/avatars/ferro-bird-detective.png'
+import ferroBirdFalcon from './assets/avatars/ferro-bird-falcon.png'
+import ferroBirdGamer from './assets/avatars/ferro-bird-gamer.png'
+import ferroBirdNinja from './assets/avatars/ferro-bird-ninja.png'
+
 const KEYFRAMES = `
   @keyframes scroll-left {
     from { transform: translateX(0); }
@@ -16,62 +22,58 @@ interface Testimonial {
   date: string
   quote: string
   tag: string
-  avatarColor: string
+  avatar: string
 }
 
 const testimonials: Testimonial[] = [
   {
     name: 'James Okafor',
     date: 'June 1, 2026',
-    quote: '“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud.”',
+    quote: '”Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud.”',
     tag: 'Lorem ipsum',
-    avatarColor: 'bg-ferro-primary',
+    avatar: ferroBirdCrow,
   },
   {
     name: 'Sarah Mitchell',
     date: 'May 28, 2026',
-    quote: '“Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. Eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt.”',
+    quote: '”Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. Eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt.”',
     tag: 'Dolor sit amet',
-    avatarColor: 'bg-ferro-deep',
+    avatar: ferroBirdDetective,
   },
   {
     name: 'Marcus Thomas',
     date: 'May 22, 2026',
-    quote: '“Consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore. Magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris.”',
+    quote: '”Consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore. Magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris.”',
     tag: 'Adipiscing elit',
-    avatarColor: 'bg-neutral-700',
+    avatar: ferroBirdFalcon,
   },
   {
     name: 'Priya Kapoor',
     date: 'May 15, 2026',
-    quote: '“Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliqua. Enim ad minim veniam quis nostrud exercitation ullamco laboris nisi.”',
+    quote: '”Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliqua. Enim ad minim veniam quis nostrud exercitation ullamco laboris nisi.”',
     tag: 'Eiusmod tempor',
-    avatarColor: 'bg-color-success',
+    avatar: ferroBirdGamer,
   },
   {
     name: 'David Nkosi',
     date: 'May 10, 2026',
-    quote: '“Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt. Mollit anim id est laborum sed ut perspiciatis unde omnis iste natus.”',
+    quote: '”Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt. Mollit anim id est laborum sed ut perspiciatis unde omnis iste natus.”',
     tag: 'Magna aliqua',
-    avatarColor: 'bg-ferro-sky',
+    avatar: ferroBirdNinja,
   },
 ]
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(' ')
-  return parts.length >= 2
-    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-    : parts[0].slice(0, 2).toUpperCase()
-}
 
-function TestimonialCard({ name, date, quote, tag, avatarColor }: Testimonial) {
+function TestimonialCard({ name, date, quote, tag, avatar }: Testimonial) {
   return (
-    <div className="bg-surface-raised rounded-card p-6 shadow-elevation-1 w-72 flex-shrink-0 flex flex-col gap-4">
+    <div className="bg-white rounded-card p-6 flex-shrink-0 flex flex-col gap-4" style={{ width: 350, height: 301, boxShadow: '0 1px 3px rgba(15,22,38,0.06), 0 4px 12px rgba(15,22,38,0.08), 0 8px 20px rgba(15,22,38,0.06)' }}>
       <div className="flex items-center gap-3">
-        <div
-          className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white font-semibold text-label flex-shrink-0`}
-        >
-          {getInitials(name)}
+        <div className="w-12 h-12 rounded-full bg-ferro-primary flex items-center justify-center flex-shrink-0">
+          <img
+            src={avatar}
+            alt={name}
+            className="w-10 h-10 rounded-full object-cover"
+          />
         </div>
         <div>
           <p className="font-semibold text-neutral-900 text-label leading-tight">{name}</p>
@@ -105,8 +107,8 @@ export default function Testimonials() {
           Drivers who have already made the switch
         </p>
       </div>
-      <div className="testimonial-outer overflow-hidden w-full">
-        <div className="testimonial-track flex gap-6">
+      <div className="testimonial-outer overflow-hidden w-full py-4">
+        <div className="testimonial-track flex gap-6 py-2">
           {cards.map((t, i) => (
             <TestimonialCard key={i} {...t} />
           ))}
