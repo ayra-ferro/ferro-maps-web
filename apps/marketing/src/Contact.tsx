@@ -12,7 +12,7 @@ const faqs = [
 ]
 
 const inputClass =
-  'bg-white border border-border-default rounded-md px-4 py-2 text-[12px] focus:ring-2 focus:ring-ferro-primary outline-none w-full'
+  'bg-white border border-border-default rounded-lg px-4 py-2 text-[12px] focus:ring-2 focus:ring-ferro-primary outline-none w-full'
 
 export default function Contact() {
   const [name, setName] = useState('')
@@ -153,7 +153,7 @@ export default function Contact() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-ferro-primary text-white rounded-md py-3 text-[12px] hover:bg-ferro-deep transition-colors duration-fast disabled:opacity-50"
+              className="w-full bg-ferro-primary text-white rounded-button py-3 text-[12px] hover:bg-ferro-deep transition-colors duration-fast disabled:opacity-50"
             >
               {loading ? 'Sending…' : 'Submit'}
             </button>
@@ -184,9 +184,10 @@ export default function Contact() {
             return (
             <div
               key={i}
-              className={`border border-border-default rounded-lg px-4 py-4 cursor-pointer shadow-sm flex-1 flex flex-col justify-center ${
+              className={`border border-border-default rounded-lg px-4 py-4 cursor-pointer flex-1 flex flex-col justify-center ${
                 i < faqs.length - 1 ? 'mb-3' : ''
               } ${isOpen ? 'bg-surface-brand-subtle' : 'bg-white'}`}
+              style={{ boxShadow: '0 2px 4px rgba(15,22,38,0.04), 0 4px 12px rgba(15,22,38,0.08)' }}
               onClick={() => setOpenFaq(isOpen ? null : i)}
             >
                 <div className="flex justify-between items-center">
