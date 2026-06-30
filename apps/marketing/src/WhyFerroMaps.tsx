@@ -1,22 +1,24 @@
-import { MapPin, Clock, Star } from 'lucide-react'
+import whereToEarn from './assets/where-to-earn.png'
+import whenToEarn from './assets/when-to-earn.png'
+import earnRewards from './assets/earn-rewards.png'
 
 const cards = [
   {
-    icon: MapPin,
+    image: whereToEarn,
     title: 'Where to earn',
     body: 'Real-time hotspot map showing demand zones near you. Know where to go before you start driving.',
-    tag: '● Live updates',
-  },
-  {
-    icon: Clock,
-    title: 'When to earn',
-    body: 'Live demand windows with countdown timers. Know exactly how long each opportunity lasts before it expires.',
     tag: '● London',
   },
   {
-    icon: Star,
+    image: whenToEarn,
+    title: 'When to earn',
+    body: 'Live demand windows with countdown timers. Know exactly how long each opportunity lasts before it expires.',
+    tag: '● Live updates',
+  },
+  {
+    image: earnRewards,
     title: 'Earn rewards',
-    body: 'Collect Ferro points every time you act on a hotspot. Redeem them for a free month of premium access.',
+    body: 'Collect XP points every time you act on a hotspot!',
     tag: '● +50 points',
   },
 ]
@@ -29,21 +31,21 @@ export default function WhyFerroMaps() {
           WHY FERRO MAPS
         </p>
         <h2 className="text-white font-bold text-headline mb-3">
-          Why drivers choose Ferro Maps
+          Why drivers choose Ferro Map
         </h2>
-        <p className="text-white font-semibold text-subtitle">
+        <p className="text-white font-semibold text-[20px] leading-snug text-center">
           Three things every London driver needs. All in one place.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
-        {cards.map(({ icon: Icon, title, body, tag }) => (
+        {cards.map(({ image, title, body, tag }) => (
           <div
             key={title}
             className="bg-white rounded-card p-8 flex flex-col gap-6 shadow-elevation-2 h-full"
           >
-            <div className="w-14 h-14 rounded-full bg-ferro-primary flex items-center justify-center text-white shrink-0">
-              <Icon size={24} />
+            <div className="w-full flex justify-center items-end h-44">
+              <img src={image} alt={title} className="h-40 w-auto object-contain" />
             </div>
 
             <div className="flex flex-col gap-2">
