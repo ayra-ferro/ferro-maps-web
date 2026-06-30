@@ -73,6 +73,8 @@ function AdminMap() {
             locationUpdatedAt: data.locationUpdatedAt ?? null,
             isOnline: data.isOnline ?? false,
             isSuspended: data.isSuspended ?? false,
+            joinedAt: data.joinedAt ?? null,
+            suspendedAt: data.suspendedAt ?? null,
           })
         })
         console.log('Drivers loaded:', all.length)

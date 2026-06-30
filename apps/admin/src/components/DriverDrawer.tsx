@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import type { Timestamp } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { formatRelativeTime } from '../lib/utils'
@@ -15,6 +15,8 @@ export interface DriverDetail {
   isOnline: boolean
   isSuspended: boolean
   locationUpdatedAt: Timestamp | null
+  joinedAt: Timestamp | null
+  suspendedAt: Timestamp | null
 }
 
 interface Props {
@@ -44,7 +46,10 @@ export default function DriverDrawer({ driver, onClose }: Props) {
     if (!driver) return
     setLoading(true)
     try {
-      await updateDoc(doc(db, 'users', driver.uid), { isSuspended: !driver.isSuspended })
+      await updateDoc(doc(db, 'users', driver.uid), {
+        isSuspended: !driver.isSuspended,
+        ...(!driver.isSuspended ? { suspendedAt: serverTimestamp() } : {}),
+      })
       onClose()
     } finally {
       setLoading(false)
@@ -133,6 +138,37 @@ export default function DriverDrawer({ driver, onClose }: Props) {
                 <div>
                   <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Email</dt>
                   <dd className="mt-1 text-xs text-text-tertiary">{driver.email || '—'}</dd>
+                </div>
+
+                {/* Account History */}
+                <div>
+                  <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mt-2 pt-4 border-t border-gray-100">
+                    Account History
+                  </p>
+                </div>
+                <div>
+                  <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Joined</dt>
+                  <dd className="mt-1 text-sm text-text-primary">
+                    {driver.joinedAt ? driver.joinedAt.toDate().toLocaleDateString() : '—'}
+                  </dd>
+                </div>
+                {driver.isSuspended && driver.suspendedAt && (
+                  <div>
+                    <dt className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Suspended on</dt>
+                    <dd className="mt-1 text-sm text-text-primary">
+                      {driver.suspendedAt.toDate().toLocaleDateString()}
+                    </dd>
+                  </div>
+                )}
+
+                {/* Ferros History — placeholder for FM-WEB-051 */}
+                <div>
+                  <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mt-2 pt-4 border-t border-gray-100">
+                    Ferros History
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-text-tertiary italic">Coming soon</p>
                 </div>
               </dl>
             </div>
