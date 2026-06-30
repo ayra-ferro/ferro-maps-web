@@ -49,8 +49,9 @@ export default function Header() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-16 py-4 flex items-center justify-between">
-          <Link to="/" className="font-bold text-ferro-primary font-nunito text-subtitle whitespace-nowrap">
-            Ferro Maps
+          <Link to="/" className="flex items-center gap-2 no-underline">
+            <img src="/ferro-bird-2.png" alt="Ferro Maps" className="h-8 w-auto" />
+            <span className="font-bold text-ferro-primary font-nunito text-subtitle whitespace-nowrap">Ferro Maps</span>
           </Link>
 
           {/* Desktop nav */}
@@ -59,7 +60,8 @@ export default function Header() {
               <a
                 key={id}
                 href={'#' + id}
-                className="text-neutral-700 font-medium no-underline transition-colors duration-fast hover:font-bold hover:text-ferro-primary active:font-bold active:text-ferro-primary"
+                data-label={label}
+                className="nav-link text-neutral-700 font-medium no-underline hover:text-ferro-primary active:text-ferro-primary"
                 onClick={(e) => {
                   e.preventDefault()
                   handleNavClick(id)
@@ -73,14 +75,14 @@ export default function Header() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <button
-              className="bg-ferro-primary text-white rounded-lg px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-deep"
+              className="bg-ferro-primary text-white rounded-button px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-deep"
               onClick={() => handleNavClick('download')}
             >
               Get Started
             </button>
             <Link
               to="/signin"
-              className="border border-ferro-primary bg-transparent text-ferro-primary rounded-lg px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
+              className="border border-ferro-primary bg-transparent text-ferro-primary rounded-button px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
             >
               Sign In
             </Link>
