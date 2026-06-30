@@ -1,6 +1,20 @@
-import { useState, useEffect } from 'react'
-import { collection, onSnapshot, doc, updateDoc, GeoPoint } from 'firebase/firestore'
-import { MoreHorizontal } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  onSnapshot,
+  getCountFromServer,
+  doc,
+  updateDoc,
+  GeoPoint,
+  Timestamp,
+  type QueryDocumentSnapshot,
+  type DocumentData,
+} from 'firebase/firestore'
+import { MoreHorizontal, ChevronUp, ChevronDown } from 'lucide-react'
 import { Input, Badge } from '@ferro-maps/ui'
 import { db } from '../lib/firebase'
 import AppShell from '../components/AppShell'
@@ -18,7 +32,10 @@ interface DriverDoc {
   isSuspended: boolean
   lat?: number
   lng?: number
+  joinedAt?: Timestamp
 }
+
+const PAGE_SIZE = 10
 
 const ZONE_OPTIONS: ZoneFilter[] = ['all', 'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6']
 
@@ -47,22 +64,57 @@ function formatBalance(n: number): string {
   return n.toLocaleString() + ' F'
 }
 
+const COLUMNS: { label: string; sortKey: string | null }[] = [
+  { label: 'Driver', sortKey: 'name' },
+  { label: 'Status', sortKey: null },
+  { label: 'Country', sortKey: 'country' },
+  { label: 'Joined', sortKey: null },
+  { label: 'Balance', sortKey: 'ferroBalance' },
+  { label: 'Phone', sortKey: null },
+  { label: 'Actions', sortKey: null },
+]
+
 export default function Drivers() {
   const [drivers, setDrivers] = useState<DriverDoc[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [suspendingUid, setSuspendingUid] = useState<string | null>(null)
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null)
+  const [sortColumn, setSortColumn] = useState('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
+  // useRef avoids stale closures when reading cursors inside the effect while
+  // keeping pageCursors out of the effect's dependency array (adding it would
+  // re-trigger the listener every time a new cursor is stored).
+  const pageCursors = useRef<QueryDocumentSnapshot<DocumentData>[]>([])
+  const [hasNextPage, setHasNextPage] = useState(false)
+  const [totalCount, setTotalCount] = useState<number | null>(null)
 
   const { statusFilter, setStatusFilter, zoneFilter, setZoneFilter, filteredDrivers } =
     useDriverFilters(drivers)
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
-      const list: DriverDoc[] = []
-      snapshot.forEach((docSnap) => {
+    getCountFromServer(collection(db, 'users')).then((snap) => {
+      setTotalCount(snap.data().count)
+    })
+  }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    const cursor = currentPage > 1 ? pageCursors.current[currentPage - 2] : undefined
+    const q = cursor
+      ? query(
+          collection(db, 'users'),
+          orderBy(sortColumn, sortDirection),
+          startAfter(cursor),
+          limit(PAGE_SIZE),
+        )
+      : query(collection(db, 'users'), orderBy(sortColumn, sortDirection), limit(PAGE_SIZE))
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      const list: DriverDoc[] = snapshot.docs.map((docSnap) => {
         const d = docSnap.data()
-        list.push({
+        return {
           uid: d.uid ?? docSnap.id,
           name: d.name ?? '',
           email: d.email ?? '',
@@ -73,13 +125,23 @@ export default function Drivers() {
           isSuspended: d.isSuspended ?? false,
           lat: d.location instanceof GeoPoint ? d.location.latitude : undefined,
           lng: d.location instanceof GeoPoint ? d.location.longitude : undefined,
-        })
+          joinedAt:
+            d.joinedAt instanceof Timestamp
+              ? d.joinedAt
+              : d.createdAt instanceof Timestamp
+                ? d.createdAt
+                : undefined,
+        }
       })
       setDrivers(list)
       setLoading(false)
+      if (snapshot.docs.length > 0) {
+        pageCursors.current[currentPage - 1] = snapshot.docs[snapshot.docs.length - 1]
+      }
+      setHasNextPage(snapshot.docs.length === PAGE_SIZE)
     })
     return () => unsub()
-  }, [])
+  }, [currentPage, sortColumn, sortDirection])
 
   useEffect(() => {
     if (!openMenuUid) return
@@ -97,6 +159,17 @@ export default function Drivers() {
       d.phoneNumber.includes(q)
     )
   })
+
+  function handleSort(key: string) {
+    if (sortColumn === key) {
+      setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortColumn(key)
+      setSortDirection('asc')
+    }
+    setCurrentPage(1)
+    pageCursors.current = []
+  }
 
   async function handleSuspendToggle(driver: DriverDoc) {
     setSuspendingUid(driver.uid)
@@ -148,6 +221,9 @@ export default function Drivers() {
               : `Showing ${filtered.length} of ${drivers.length} drivers`}
           </p>
         </div>
+        <p className="text-xs text-text-tertiary -mt-2">
+          Search and filters apply to the current page only
+        </p>
 
         {/* Table card */}
         <div className="bg-white rounded-card border border-gray-200 shadow-md overflow-hidden">
@@ -155,12 +231,27 @@ export default function Drivers() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-neutral-50">
-                  {['Driver', 'Status', 'Country', 'Balance', 'Phone', 'Actions'].map((h) => (
+                  {COLUMNS.map((col) => (
                     <th
-                      key={h}
+                      key={col.label}
                       className="px-4 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wide"
                     >
-                      {h}
+                      {col.sortKey ? (
+                        <button
+                          onClick={() => handleSort(col.sortKey!)}
+                          className="flex items-center gap-1 hover:text-text-primary transition-colors"
+                        >
+                          {col.label}
+                          {sortColumn === col.sortKey &&
+                            (sortDirection === 'asc' ? (
+                              <ChevronUp size={12} />
+                            ) : (
+                              <ChevronDown size={12} />
+                            ))}
+                        </button>
+                      ) : (
+                        col.label
+                      )}
                     </th>
                   ))}
                 </tr>
@@ -188,6 +279,9 @@ export default function Drivers() {
                         <div className="h-3 w-20 bg-neutral-200 animate-pulse rounded" />
                       </td>
                       <td className="px-4 py-3">
+                        <div className="h-3 w-20 bg-neutral-200 animate-pulse rounded" />
+                      </td>
+                      <td className="px-4 py-3">
                         <div className="h-3 w-24 bg-neutral-200 animate-pulse rounded" />
                       </td>
                       <td className="px-4 py-3">
@@ -197,7 +291,7 @@ export default function Drivers() {
                   ))
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6}>
+                    <td colSpan={7}>
                       <div className="py-16 text-center text-text-secondary">No drivers found</div>
                     </td>
                   </tr>
@@ -205,7 +299,8 @@ export default function Drivers() {
                   filtered.map((driver) => (
                     <tr
                       key={driver.uid}
-                      className="border-b border-gray-200 last:border-0 hover:bg-neutral-50"
+                      className="border-b border-gray-200 last:border-0 hover:bg-neutral-50 cursor-pointer"
+                      onClick={() => console.log('Open driver detail:', driver.uid)}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -234,6 +329,9 @@ export default function Drivers() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-text-secondary">{driver.country || '—'}</td>
+                      <td className="px-4 py-3 text-text-secondary">
+                        {driver.joinedAt ? driver.joinedAt.toDate().toLocaleDateString() : '—'}
+                      </td>
                       <td className="px-4 py-3 text-text-secondary">
                         {formatBalance(driver.ferroBalance)}
                       </td>
@@ -277,6 +375,30 @@ export default function Drivers() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination footer */}
+          <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between text-sm text-text-secondary">
+            <span>
+              Showing page {currentPage}
+              {totalCount !== null && ` of approximately ${totalCount} drivers total`}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-button border border-gray-300 text-sm disabled:opacity-40 hover:bg-neutral-50 transition-colors disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={!hasNextPage}
+                className="px-3 py-1.5 rounded-button border border-gray-300 text-sm disabled:opacity-40 hover:bg-neutral-50 transition-colors disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
