@@ -22,13 +22,13 @@ export default function Hero() {
           <div className="mt-10 flex gap-4">
             <button
               onClick={() => scrollTo('download')}
-              className="bg-ferro-primary text-white rounded-lg px-6 py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast"
+              className="bg-ferro-primary text-white rounded-button px-6 py-3 font-semibold hover:bg-ferro-deep transition-colors duration-fast"
             >
               Get Started
             </button>
             <button
               onClick={() => scrollTo('how-it-works')}
-              className="border border-ferro-primary text-ferro-primary bg-white rounded-lg px-6 py-3 font-semibold hover:bg-ferro-tint transition-colors duration-fast"
+              className="border border-ferro-primary text-ferro-primary bg-white rounded-button px-6 py-3 font-semibold hover:bg-ferro-tint transition-colors duration-fast"
             >
               How It Works
             </button>
