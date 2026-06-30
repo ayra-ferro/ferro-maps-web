@@ -100,7 +100,6 @@ export default function Drivers() {
   }, [])
 
   useEffect(() => {
-    setLoading(true)
     const cursor = currentPage > 1 ? pageCursors.current[currentPage - 2] : undefined
     const q = cursor
       ? query(
@@ -161,6 +160,7 @@ export default function Drivers() {
   })
 
   function handleSort(key: string) {
+    setLoading(true)
     if (sortColumn === key) {
       setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))
     } else {
@@ -385,14 +385,14 @@ export default function Drivers() {
             </span>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setCurrentPage((p) => p - 1)}
+                onClick={() => { setLoading(true); setCurrentPage((p) => p - 1) }}
                 disabled={currentPage === 1}
                 className="px-3 py-1.5 rounded-button border border-gray-300 text-sm disabled:opacity-40 hover:bg-neutral-50 transition-colors disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
-                onClick={() => setCurrentPage((p) => p + 1)}
+                onClick={() => { setLoading(true); setCurrentPage((p) => p + 1) }}
                 disabled={!hasNextPage}
                 className="px-3 py-1.5 rounded-button border border-gray-300 text-sm disabled:opacity-40 hover:bg-neutral-50 transition-colors disabled:cursor-not-allowed"
               >
