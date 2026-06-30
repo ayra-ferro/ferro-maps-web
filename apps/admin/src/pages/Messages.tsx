@@ -179,14 +179,23 @@ export default function Messages() {
                 </div>
                 {selected.replies && selected.replies.length > 0 && (
                   <div className="space-y-3">
-                    {selected.replies.map((reply, i) => (
-                      <div key={i} className="bg-ferro-tint rounded-xl p-4 text-sm">
-                        <div className="text-xs text-gray-400 mb-1">
-                          Admin reply · {reply.sentAt.toDate().toLocaleString()}
+                    {selected.replies.map((reply, i) =>
+                      reply.sentBy === 'driver' ? (
+                        <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm">
+                          <div className="text-xs text-gray-400 mb-1">
+                            Driver reply · {reply.sentAt.toDate().toLocaleString()}
+                          </div>
+                          <div className="text-gray-700">{reply.text}</div>
                         </div>
-                        <div className="text-gray-700">{reply.text}</div>
-                      </div>
-                    ))}
+                      ) : (
+                        <div key={i} className="bg-ferro-tint rounded-xl p-4 text-sm">
+                          <div className="text-xs text-gray-400 mb-1">
+                            Admin reply · {reply.sentAt.toDate().toLocaleString()}
+                          </div>
+                          <div className="text-gray-700">{reply.text}</div>
+                        </div>
+                      )
+                    )}
                   </div>
                 )}
               </div>
