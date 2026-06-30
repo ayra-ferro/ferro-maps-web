@@ -1,15 +1,19 @@
-function PhoneSVG({ clipId }: { clipId: string }) {
+import mapView from './assets/map-view.png'
+import exploreOpportunities from './assets/explore-opportunities.png'
+import profile from './assets/profile.png'
+
+function PhoneSVG({ clipId, image }: { clipId: string; image: string }) {
   return (
     <svg
       width="280"
-      height="560"
-      viewBox="0 0 280 560"
+      height="580"
+      viewBox="0 0 280 580"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
         <clipPath id={clipId}>
-          <rect x="4" y="4" width="272" height="552" rx="38" ry="38" />
+          <rect x="3" y="3" width="274" height="574" rx="45" ry="45" />
         </clipPath>
       </defs>
       {/* Outer phone shell */}
@@ -17,28 +21,33 @@ function PhoneSVG({ clipId }: { clipId: string }) {
         x="2"
         y="2"
         width="276"
-        height="556"
-        rx="40"
-        ry="40"
-        fill="white"
+        height="576"
+        rx="46"
+        ry="46"
+        fill="none"
         stroke="#0F1626"
-        strokeWidth="4"
+        strokeWidth="5"
       />
-      {/* Dynamic island pill */}
-      <rect x="100" y="16" width="80" height="26" rx="13" fill="#0F1626" />
-      {/* Decorative screen ellipses — clipped to phone screen */}
-      <g clipPath={`url(#${clipId})`}>
-        <ellipse cx="105" cy="330" rx="128" ry="108" fill="#EEF2F8" />
-        <ellipse cx="178" cy="248" rx="108" ry="138" fill="#DDE4EF" />
-      </g>
+      {/* Screenshot clipped to phone screen */}
+      <image
+        href={image}
+        x="3"
+        y="3"
+        width="274"
+        height="574"
+        clipPath={`url(#${clipId})`}
+        preserveAspectRatio="xMidYMid slice"
+      />
+      {/* Dynamic island pill on top */}
+      <rect x="105" y="16" width="70" height="22" rx="11" fill="#0F1626" />
     </svg>
   )
 }
 
 const phones = [
-  { label: 'Map View', clipId: 'screen-clip-1' },
-  { label: 'Explore Opportunities', clipId: 'screen-clip-2' },
-  { label: 'Profile', clipId: 'screen-clip-3' },
+  { label: 'Map View', clipId: 'screen-clip-1', image: mapView },
+  { label: 'Explore Opportunities', clipId: 'screen-clip-2', image: exploreOpportunities },
+  { label: 'Profile', clipId: 'screen-clip-3', image: profile },
 ]
 
 export default function AppScreenshots() {
@@ -62,10 +71,10 @@ export default function AppScreenshots() {
         className="flex items-end gap-8 lg:gap-12 lg:justify-center overflow-x-auto lg:overflow-x-hidden snap-x snap-mandatory lg:snap-none -mx-6 px-6 lg:mx-0 lg:px-0 pb-4 lg:pb-0"
         style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
       >
-        {phones.map(({ label, clipId }) => (
+        {phones.map(({ label, clipId, image }) => (
           <div key={label} className="flex flex-col items-center gap-4 snap-center shrink-0">
             <span className="text-label font-medium text-neutral-700">{label}</span>
-            <PhoneSVG clipId={clipId} />
+            <PhoneSVG clipId={clipId} image={image} />
           </div>
         ))}
       </div>
