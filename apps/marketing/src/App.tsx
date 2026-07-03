@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import FerroScrollCompanion from './components/FerroScrollCompanion'
+import TicketView from './pages/TicketView'
 
 function Home() {
   const location = useLocation()
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/terms-conditions" element={<TermsConditions />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/ticket/:token" element={<TicketView />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
