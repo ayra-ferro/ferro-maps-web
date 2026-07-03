@@ -3,7 +3,7 @@ import {
   onDocumentCreated,
   onDocumentUpdated,
 } from "firebase-functions/v2/firestore";
-import {onRequest} from "firebase-functions/v2/https";
+import {onRequest, onCall, HttpsError, CallableRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import sgMail from "@sendgrid/mail";
@@ -280,5 +280,40 @@ export const onInboundEmail = onRequest(
       logger.error("onInboundEmail: failed to process inbound email", error);
       res.status(200).send("OK"); // Still 200 to prevent SendGrid retry storms
     }
+  }
+);
+
+export const setDriverSuspended = onCall(
+  {region: "europe-west2"},
+  async (request: CallableRequest) => {
+    // Verify caller is an authenticated admin
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "You must be signed in.");
+    }
+    if (request.auth.token.role !== "admin") {
+      throw new HttpsError("permission-denied", "Admin access required.");
+    }
+
+    const {uid, suspend} = request.data as {uid: string; suspend: boolean};
+
+    if (!uid || typeof suspend !== "boolean") {
+      throw new HttpsError("invalid-argument", "uid and suspend are required.");
+    }
+
+    const userRef = db.collection("users").doc(uid);
+
+    if (suspend) {
+      await userRef.update({
+        isSuspended: true,
+        suspendedAt: FieldValue.serverTimestamp(),
+      });
+    } else {
+      await userRef.update({
+        isSuspended: false,
+      });
+    }
+
+    logger.info(`setDriverSuspended: uid=${uid} suspend=${suspend} by admin=${request.auth.uid}`);
+    return {success: true};
   }
 );
