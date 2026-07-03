@@ -3,13 +3,13 @@ import {
   onDocumentCreated,
   onDocumentUpdated,
 } from "firebase-functions/v2/firestore";
-import {onRequest, onCall, HttpsError, CallableRequest} from "firebase-functions/v2/https";
+import {onCall, HttpsError, CallableRequest} from "firebase-functions/v2/https";
 import {defineSecret} from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import sgMail from "@sendgrid/mail";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import {initializeApp, getApps} from "firebase-admin/app";
-import busboy from "busboy";
+import * as crypto from "crypto";
 
 if (getApps().length === 0) {
   initializeApp();
@@ -17,6 +17,7 @@ if (getApps().length === 0) {
 const db = getFirestore();
 
 const sendgridApiKey = defineSecret("SENDGRID_API_KEY");
+const ticketSecret = defineSecret("TICKET_HMAC_SECRET");
 
 setGlobalOptions({maxInstances: 10, region: "europe-west2"});
 
@@ -24,9 +25,38 @@ const FROM_EMAIL = "admin@ferromaps.com";
 const FROM_NAME = "Ferro Maps";
 const ADMIN_NOTIFICATION_EMAIL = "admin@ferromaps.com";
 const ADMIN_DASHBOARD_URL = "https://admin.ferromaps.com";
+const MARKETING_SITE_URL = "https://ferromaps.com";
 
 function formatTicketNumber(ticketNumber: number): string {
   return "#" + String(ticketNumber).slice(-5).padStart(5, "0");
+}
+
+export function generateToken(ticketId: string, email: string, secret: string): string {
+  const payload = `${ticketId}:${email}`;
+  const sig = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+  const b64 = Buffer.from(payload).toString("base64url");
+  return `${b64}.${sig}`;
+}
+
+function verifyToken(
+  token: string,
+  secret: string
+): {ticketId: string; email: string} | null {
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [b64, sig] = parts;
+  const payload = Buffer.from(b64, "base64url").toString();
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+  if (sig !== expected) return null;
+  const [ticketId, email] = payload.split(":");
+  if (!ticketId || !email) return null;
+  return {ticketId, email};
 }
 
 export const onNewTicket = onDocumentCreated(
@@ -54,7 +84,6 @@ export const onNewTicket = onDocumentCreated(
     try {
       await sgMail.send({
         from: {email: FROM_EMAIL, name: FROM_NAME},
-        replyTo: `ticket-${ticketNumber}@reply.ferromaps.com`,
         to: email,
         subject: `Thank you for contacting us (${formattedTicket})`,
         text: [
@@ -144,10 +173,15 @@ export const onTicketUpdated = onDocumentUpdated(
 
     if (afterRepliesLen > beforeRepliesLen && afterReplies) {
       const newestReply = afterReplies[afterReplies.length - 1];
+      const replyToken = generateToken(
+        event.params.ticketId,
+        afterData.email,
+        ticketSecret.value()
+      );
+      const replyUrl = `${MARKETING_SITE_URL}/ticket/${replyToken}`;
       try {
         await sgMail.send({
           from: {email: FROM_EMAIL, name: FROM_NAME},
-          replyTo: `ticket-${afterData.ticketNumber}@reply.ferromaps.com`,
           to: email,
           subject: `New reply to your ticket (${formattedTicket})`,
           text: [
@@ -160,6 +194,8 @@ export const onTicketUpdated = onDocumentUpdated(
             "If you need further assistance, feel free to visit our contact page and submit a new message. Our team will continue to follow up with you.",
             "",
             "The Ferro Maps Team",
+            "",
+            `To reply to this ticket, visit: ${replyUrl}`,
           ].join("\n"),
           html: `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
@@ -167,6 +203,9 @@ export const onTicketUpdated = onDocumentUpdated(
   <p style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap">${newestReply.text}</p>
   <p>If you need further assistance, feel free to visit our contact page and submit a new message. Our team will continue to follow up with you.</p>
   <p style="margin-top:32px;color:#666">The Ferro Maps Team</p>
+  <div style="text-align:center;margin-top:24px;">
+    <a href="${replyUrl}" style="display:inline-block;background:#1E7BFF;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Reply to this ticket</a>
+  </div>
 </div>`,
         });
         logger.info(`onTicketUpdated: reply notification sent to ${email} (${formattedTicket})`);
@@ -180,7 +219,6 @@ export const onTicketUpdated = onDocumentUpdated(
       try {
         await sgMail.send({
           from: {email: FROM_EMAIL, name: FROM_NAME},
-          replyTo: `ticket-${afterData.ticketNumber}@reply.ferromaps.com`,
           to: email,
           subject: `Your ticket (${formattedTicket}) has been closed`,
           text: [
@@ -208,78 +246,107 @@ export const onTicketUpdated = onDocumentUpdated(
   }
 );
 
-export const onInboundEmail = onRequest(
-  {region: "europe-west2"},
-  async (req, res) => {
-    try {
-      if (req.method !== "POST") {
-        res.status(405).send("Method Not Allowed");
-        return;
-      }
-
-      // Parse multipart form data from SendGrid Inbound Parse
-      const bb = busboy({headers: req.headers});
-      const fields: Record<string, string> = {};
-
-      await new Promise<void>((resolve, reject) => {
-        bb.on("field", (name, value) => {
-          fields[name] = value;
-        });
-        bb.on("close", resolve);
-        bb.on("error", reject);
-        bb.end(req.rawBody);
-      });
-
-      // SendGrid Inbound Parse provides 'to', 'from', 'subject', 'text' fields
-      const toAddress = fields["to"] || "";
-      const bodyText = fields["text"] || "";
-
-      // Extract ticket number from the 'to' address, e.g. ticket-49779@reply.ferromaps.com
-      const match = toAddress.match(/ticket-(\d+)@/);
-      if (!match) {
-        logger.warn("onInboundEmail: could not extract ticket number from", toAddress);
-        res.status(200).send("OK"); // Always 200 so SendGrid doesn't retry
-        return;
-      }
-
-      const ticketNumber = Number(match[1]);
-
-      // Find the ticket document by ticketNumber field
-      const snapshot = await db
-        .collection("supportRequests")
-        .where("ticketNumber", "==", ticketNumber)
-        .limit(1)
-        .get();
-
-      if (snapshot.empty) {
-        logger.warn("onInboundEmail: no ticket found for number", ticketNumber);
-        res.status(200).send("OK");
-        return;
-      }
-
-      const ticketDoc = snapshot.docs[0];
-
-      // Strip common quoted-reply patterns (basic heuristic - keeps only text
-      // before the first quoted-reply marker)
-      const cleanedText = bodyText
-        .split(/\nOn .+ wrote:\n/)[0]
-        .split(/\n-----Original Message-----/)[0]
-        .trim();
-
-      await ticketDoc.ref.update({
-        replies: FieldValue.arrayUnion({
-          text: cleanedText || bodyText.trim(),
-          sentAt: new Date(),
-          sentBy: "driver",
-        }),
-      });
-
-      logger.info(`onInboundEmail: appended driver reply to ticket #${ticketNumber}`);
-      res.status(200).send("OK");
-    } catch (error) {
-      logger.error("onInboundEmail: failed to process inbound email", error);
-      res.status(200).send("OK"); // Still 200 to prevent SendGrid retry storms
+export const validateTicketToken = onCall(
+  {region: "europe-west2", secrets: [ticketSecret]},
+  async (request) => {
+    const token = request.data?.token as string | undefined;
+    if (!token) {
+      throw new HttpsError("invalid-argument", "Token is required");
     }
+
+    const parsed = verifyToken(token, ticketSecret.value());
+    if (!parsed) {
+      throw new HttpsError("unauthenticated", "Invalid or tampered token");
+    }
+
+    const {ticketId, email} = parsed;
+
+    const ticketSnap = await db
+      .collection("supportRequests")
+      .doc(ticketId)
+      .get();
+
+    if (!ticketSnap.exists) {
+      throw new HttpsError("not-found", "Ticket not found");
+    }
+
+    const ticket = ticketSnap.data()!;
+
+    if (ticket.email !== email) {
+      throw new HttpsError("permission-denied", "Token does not match ticket");
+    }
+
+    if (ticket.status === "closed") {
+      throw new HttpsError(
+        "failed-precondition",
+        "This ticket is closed and can no longer be replied to"
+      );
+    }
+
+    return {
+      ticketId,
+      ticketNumber: ticket.ticketNumber,
+      subject: ticket.subject,
+      message: ticket.message,
+      status: ticket.status,
+      replies: ticket.replies ?? [],
+      submittedAt: ticket.submittedAt?.toDate?.()?.toISOString() ?? null,
+    };
+  }
+);
+
+export const submitDriverReply = onCall(
+  {region: "europe-west2", secrets: [ticketSecret]},
+  async (request) => {
+    const {token, replyText} = request.data as {
+      token: string;
+      replyText: string;
+    };
+
+    if (!token || !replyText?.trim()) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Token and reply text are required"
+      );
+    }
+
+    const parsed = verifyToken(token, ticketSecret.value());
+    if (!parsed) {
+      throw new HttpsError("unauthenticated", "Invalid or tampered token");
+    }
+
+    const {ticketId, email} = parsed;
+
+    const ticketRef = db.collection("supportRequests").doc(ticketId);
+    const ticketSnap = await ticketRef.get();
+
+    if (!ticketSnap.exists) {
+      throw new HttpsError("not-found", "Ticket not found");
+    }
+
+    const ticket = ticketSnap.data()!;
+
+    if (ticket.email !== email) {
+      throw new HttpsError("permission-denied", "Token does not match ticket");
+    }
+
+    if (ticket.status === "closed") {
+      throw new HttpsError(
+        "failed-precondition",
+        "This ticket is closed and can no longer be replied to"
+      );
+    }
+
+    await ticketRef.update({
+      replies: FieldValue.arrayUnion({
+        text: replyText.trim(),
+        sentAt: new Date(),
+        sentBy: "driver",
+      }),
+    });
+
+    logger.info(`submitDriverReply: driver reply added to ticket ${ticketId}`);
+    return {success: true};
   }
 );
 
