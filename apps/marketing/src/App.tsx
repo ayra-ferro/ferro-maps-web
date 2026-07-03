@@ -31,22 +31,45 @@ function Home() {
     }
   }, [location.hash])
 
+  useEffect(() => {
+    const sections = document.querySelectorAll('.section-fade')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('section-visible')
+          } else {
+            entry.target.classList.remove('section-visible')
+          }
+        })
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    )
+
+    sections.forEach((el) => {
+      observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div className="min-h-screen bg-white text-text-primary font-nunito">
       <FerroScrollCompanion />
       <Header />
-      <Hero />
+      <div className="animate-fade-up"><Hero /></div>
 
       <main>
-        <WhyFerroMaps />
-        <AppScreenshots />
-        <HowItWorks />
-        <Testimonials />
+        <div className="section-fade"><WhyFerroMaps /></div>
+        <div className="section-fade"><AppScreenshots /></div>
+        <div className="section-fade"><HowItWorks /></div>
+        <div className="section-fade"><Testimonials /></div>
       </main>
 
-      <DownloadBanner />
-      <Contact />
-      <Footer />
+      <div className="section-fade"><DownloadBanner /></div>
+      <div className="section-fade"><Contact /></div>
+      <div className="section-fade"><Footer /></div>
     </div>
   )
 }
