@@ -84,6 +84,7 @@ export default function Drivers() {
   const [selectedDriver, setSelectedDriver] = useState<DriverDetail | null>(null)
   const [suspendingUid, setSuspendingUid] = useState<string | null>(null)
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null)
+  const [refreshTick, setRefreshTick] = useState(0)
   const [sortColumn, setSortColumn] = useState('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -145,7 +146,7 @@ export default function Drivers() {
       setHasNextPage(snapshot.docs.length === PAGE_SIZE)
     })
     return () => unsub()
-  }, [currentPage, sortColumn, sortDirection])
+  }, [currentPage, sortColumn, sortDirection, refreshTick])
 
   useEffect(() => {
     if (!openMenuUid) return
@@ -180,6 +181,7 @@ export default function Drivers() {
     setSuspendingUid(driver.uid)
     try {
       await updateDoc(doc(db, 'users', driver.uid), { isSuspended: !driver.isSuspended })
+      setRefreshTick((t) => t + 1)
     } finally {
       setSuspendingUid(null)
       setOpenMenuUid(null)
