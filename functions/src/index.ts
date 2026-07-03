@@ -147,7 +147,7 @@ export const onNewTicket = onDocumentCreated(
 );
 
 export const onTicketUpdated = onDocumentUpdated(
-  {document: "supportRequests/{ticketId}", secrets: [sendgridApiKey]},
+  {document: "supportRequests/{ticketId}", secrets: [sendgridApiKey, ticketSecret]},
   async (event) => {
     sgMail.setApiKey(sendgridApiKey.value());
 
@@ -178,6 +178,7 @@ export const onTicketUpdated = onDocumentUpdated(
         afterData.email,
         ticketSecret.value()
       );
+      logger.info(`DEBUG replyToken: ${replyToken}`);
       const replyUrl = `${MARKETING_SITE_URL}/ticket/${replyToken}`;
       try {
         await sgMail.send({
@@ -247,7 +248,7 @@ export const onTicketUpdated = onDocumentUpdated(
 );
 
 export const validateTicketToken = onCall(
-  {region: "europe-west2", secrets: [ticketSecret]},
+  {region: "europe-west2", secrets: [ticketSecret], invoker: "public", cors: true},
   async (request) => {
     const token = request.data?.token as string | undefined;
     if (!token) {
@@ -296,7 +297,7 @@ export const validateTicketToken = onCall(
 );
 
 export const submitDriverReply = onCall(
-  {region: "europe-west2", secrets: [ticketSecret]},
+  {region: "europe-west2", secrets: [ticketSecret], invoker: "public", cors: true},
   async (request) => {
     const {token, replyText} = request.data as {
       token: string;
