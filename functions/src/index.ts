@@ -178,7 +178,6 @@ export const onTicketUpdated = onDocumentUpdated(
         afterData.email,
         ticketSecret.value()
       );
-      logger.info(`DEBUG replyToken: ${replyToken}`);
       const replyUrl = `${MARKETING_SITE_URL}/ticket/${replyToken}`;
       try {
         await sgMail.send({
