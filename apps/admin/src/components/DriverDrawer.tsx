@@ -50,7 +50,9 @@ export default function DriverDrawer({ driver, onClose }: Props) {
         isSuspended: !driver.isSuspended,
         ...(!driver.isSuspended ? { suspendedAt: serverTimestamp() } : {}),
       })
-      onClose()
+      setTimeout(() => {
+        onClose()
+      }, 500)
     } finally {
       setLoading(false)
     }
