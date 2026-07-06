@@ -6,6 +6,7 @@ import SignIn from './pages/SignIn'
 import CreateAccount from './pages/CreateAccount'
 import Dashboard from './pages/Dashboard'
 import Drivers from './pages/Drivers'
+import Rankings from './pages/Rankings'
 import ComingSoon from './pages/ComingSoon'
 import Messages from './pages/Messages'
 
@@ -39,6 +40,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/rankings" element={<ProtectedRoute><Rankings /></ProtectedRoute>} />
           <Route
             path="/messages"
             element={
