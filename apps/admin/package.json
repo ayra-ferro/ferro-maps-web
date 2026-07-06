@@ -11,18 +11,19 @@
   },
   "dependencies": {
     "@ferro-maps/ui": "workspace:*",
+    "@fontsource/nunito": "^5.2.5",
     "@googlemaps/markerclusterer": "^2.5.3",
     "@react-google-maps/api": "^2.20.8",
+    "@sentry/react": "^10.63.0",
     "firebase": "^12.13.0",
-    "@fontsource/nunito": "^5.2.5",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
-    "react-router-dom": "^7.17.0",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.17.0"
   },
   "devDependencies": {
-    "@ferro-maps/config": "workspace:*",
     "@eslint/js": "^10.0.1",
+    "@ferro-maps/config": "workspace:*",
     "@types/google.maps": "^3.65.2",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
