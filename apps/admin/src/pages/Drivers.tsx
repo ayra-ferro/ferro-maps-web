@@ -6,7 +6,6 @@ import {
   limit,
   startAfter,
   onSnapshot,
-  getCountFromServer,
   doc,
   updateDoc,
   GeoPoint,
@@ -93,16 +92,9 @@ export default function Drivers() {
   // re-trigger the listener every time a new cursor is stored).
   const pageCursors = useRef<QueryDocumentSnapshot<DocumentData>[]>([])
   const [hasNextPage, setHasNextPage] = useState(false)
-  const [totalCount, setTotalCount] = useState<number | null>(null)
 
   const { statusFilter, setStatusFilter, zoneFilter, setZoneFilter, filteredDrivers } =
     useDriverFilters(drivers)
-
-  useEffect(() => {
-    getCountFromServer(collection(db, 'users')).then((snap) => {
-      setTotalCount(snap.data().count)
-    })
-  }, [])
 
   useEffect(() => {
     const cursor = currentPage > 1 ? pageCursors.current[currentPage - 2] : undefined
@@ -400,7 +392,6 @@ export default function Drivers() {
           <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between text-sm text-text-secondary">
             <span>
               Showing page {currentPage}
-              {totalCount !== null && ` of approximately ${totalCount} drivers total`}
             </span>
             <div className="flex items-center gap-2">
               <button
