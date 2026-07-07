@@ -16,8 +16,6 @@ import { useAuth } from '../contexts/AuthContext'
 import AppShell from '../components/AppShell'
 import AdminMap from '../components/AdminMap'
 
-const OPEN_TICKETS = 3
-
 interface RecentTicket {
   id: string
   email: string
@@ -37,6 +35,7 @@ export default function Dashboard() {
   const [totalDrivers, setTotalDrivers] = useState(0)
   const [recentTickets, setRecentTickets] = useState<RecentTicket[]>([])
   const [ticketsLoading, setTicketsLoading] = useState(true)
+  const [openTicketsCount, setOpenTicketsCount] = useState(0)
 
   useEffect(() => {
     const onlineUnsub = onSnapshot(
@@ -61,10 +60,15 @@ export default function Dashboard() {
         setTicketsLoading(false)
       },
     )
+    const openTicketsUnsub = onSnapshot(
+      query(collection(db, 'supportRequests'), where('status', '==', 'open')),
+      (snap) => setOpenTicketsCount(snap.size),
+    )
     return () => {
       onlineUnsub()
       totalUnsub()
       ticketsUnsub()
+      openTicketsUnsub()
     }
   }, [])
 
@@ -106,7 +110,7 @@ export default function Dashboard() {
                 <MessageSquare size={18} className="text-red-500" />
               </div>
               <p className="text-label text-text-secondary">Open tickets</p>
-              <p className="text-2xl font-medium text-text-primary">{OPEN_TICKETS}</p>
+              <p className="text-2xl font-medium text-text-primary">{openTicketsCount}</p>
             </div>
           </Card>
         </div>
