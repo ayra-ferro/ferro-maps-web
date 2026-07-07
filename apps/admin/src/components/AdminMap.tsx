@@ -212,4 +212,4 @@ function AdminMap() {
   )
 }
 
-export default React.memo(AdminMap)
+export default AdminMap
