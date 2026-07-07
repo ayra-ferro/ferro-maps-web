@@ -49,6 +49,7 @@ function AdminMap() {
 
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [selectedUid, setSelectedUid] = useState<string | null>(null)
+  const [driversLoaded, setDriversLoaded] = useState(false)
 
   const { statusFilter, setStatusFilter, zoneFilter, setZoneFilter, filteredDrivers } =
     useDriverFilters(drivers)
@@ -79,6 +80,7 @@ function AdminMap() {
         })
         console.log('Drivers loaded:', all.length)
         setDrivers(all)
+        setDriversLoaded(true)
       },
       (error) => console.error('Firestore snapshot error:', error),
     )
@@ -177,7 +179,7 @@ function AdminMap() {
             >
               {(clusterer) => (
                 <div>
-                  {filteredDrivers.map((driver) => (
+                  {driversLoaded && filteredDrivers.map((driver) => (
                     <Marker
                       key={driver.uid}
                       clusterer={clusterer}
