@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, MarkerClusterer } from '@react-google-maps/api'
 import { MapPin } from 'lucide-react'
 import { collection, onSnapshot, GeoPoint } from 'firebase/firestore'
