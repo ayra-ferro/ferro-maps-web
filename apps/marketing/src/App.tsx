@@ -16,7 +16,6 @@ import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
-import FerroScrollCompanion from './components/FerroScrollCompanion'
 import TicketView from './pages/TicketView'
 
 function Home() {
@@ -57,7 +56,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-white text-text-primary font-nunito">
-      <FerroScrollCompanion />
       <Header />
       <div className="animate-fade-up"><Hero /></div>
 
