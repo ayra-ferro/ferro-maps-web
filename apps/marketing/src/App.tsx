@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import TicketView from './pages/TicketView'
+import Waitlist from './pages/Waitlist'
 
 function Home() {
   const location = useLocation()
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/ticket/:token" element={<TicketView />} />
+            <Route path="/waitlist" element={<Waitlist />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
