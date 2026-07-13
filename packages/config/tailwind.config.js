@@ -83,6 +83,7 @@ export default {
         "tier-flawless": "#FFB72E",
       },
       fontFamily: {
+        sans: ["Nunito", "sans-serif"],
         geist: ["Geist", "sans-serif"],
         nunito: ["Nunito", "sans-serif"],
       },

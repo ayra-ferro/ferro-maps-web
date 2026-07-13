@@ -56,7 +56,7 @@ function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white text-text-primary font-nunito">
+    <div className="min-h-screen bg-white text-text-primary font-sans">
       <Header />
       <div className="animate-fade-up"><Hero /></div>
 
