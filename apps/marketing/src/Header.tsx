@@ -70,6 +70,12 @@ export default function Header() {
                 {label}
               </a>
             ))}
+            <Link
+              to="/waitlist"
+              className="text-neutral-700 font-medium no-underline rounded-full transition-all duration-fast ease-standard hover:bg-ferro-signal hover:text-white hover:font-bold hover:px-[19px] hover:py-[9px]"
+            >
+              Join waitlist
+            </Link>
           </nav>
 
           {/* Desktop CTA */}
