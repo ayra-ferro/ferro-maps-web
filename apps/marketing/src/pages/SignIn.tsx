@@ -104,8 +104,6 @@ export default function SignIn() {
   useEffect(() => {
     if (screen !== 'otp') return
 
-    setCountdown(59)
-
     const interval = window.setInterval(() => {
       setCountdown(previous => {
         if (previous <= 1) {
