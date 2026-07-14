@@ -18,6 +18,7 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import TicketView from './pages/TicketView'
 import Waitlist from './pages/Waitlist'
+import WaitlistConfirmed from './pages/WaitlistConfirmed'
 
 function Home() {
   const location = useLocation()
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/ticket/:token" element={<TicketView />} />
             <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/waitlist/confirmed" element={<WaitlistConfirmed />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
