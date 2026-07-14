@@ -164,6 +164,12 @@ export default function SignIn() {
 
       {screen === 'otp' && (
         <>
+          <h2 className="text-white font-bold text-xl text-center mb-2 mt-4">Enter the 6-digit code</h2>
+          <p className="text-white text-sm text-center mb-6 opacity-90">
+            Sent to +44 {phoneNumber}
+            <span onClick={handleGoBack} className="font-bold cursor-pointer underline ml-1">Edit</span>
+          </p>
+
           <div className="w-full max-w-sm mx-auto mt-8">
             <button
               onClick={handleGoBack}
@@ -173,12 +179,6 @@ export default function SignIn() {
               Back
             </button>
           </div>
-
-          <h2 className="text-white font-bold text-xl text-center mb-2 mt-4">Enter the 6-digit code</h2>
-          <p className="text-white text-sm text-center mb-6 opacity-90">
-            Sent to +44 {phoneNumber}
-            <span onClick={handleGoBack} className="font-bold cursor-pointer underline ml-1">Edit</span>
-          </p>
 
           <div className="bg-white rounded-2xl p-8 w-full max-w-sm mx-auto shadow-lg">
             <div className="flex gap-3 justify-center mb-6">
