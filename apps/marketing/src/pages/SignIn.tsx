@@ -146,6 +146,7 @@ export default function SignIn() {
             </div>
 
             <button
+              type="button"
               onClick={handleSendOtp}
               className="bg-ferro-primary text-white rounded-lg py-3 font-semibold text-sm tracking-widest uppercase w-full"
             >
@@ -166,6 +167,7 @@ export default function SignIn() {
         <>
           <div className="w-full max-w-sm mx-auto mt-8">
             <button
+              type="button"
               onClick={handleGoBack}
               className="flex items-center gap-1 text-white/70 hover:text-ferro-primary transition-colors duration-fast text-sm font-semibold"
             >
@@ -199,6 +201,7 @@ export default function SignIn() {
             </div>
 
             <button
+              type="button"
               onClick={handleVerifyOtp}
               className="bg-ferro-primary text-white rounded-lg py-3 font-semibold text-sm tracking-widest uppercase w-full"
             >
@@ -223,7 +226,7 @@ export default function SignIn() {
         </>
       )}
 
-      <div id="recaptcha-container" className="hidden" />
+      <div id="recaptcha-container" style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} />
     </div>
   )
 }
