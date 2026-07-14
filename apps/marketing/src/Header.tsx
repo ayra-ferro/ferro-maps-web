@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import { useAuth } from './context/useAuth'
 
 const navLinks = [
   { id: 'why-ferro-maps', label: 'Why Ferro Maps' },
@@ -14,6 +15,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { user } = useAuth()
 
   useEffect(() => {
     let prevScrollY = window.scrollY
@@ -86,12 +88,21 @@ export default function Header() {
             >
               Get Started
             </button>
-            <Link
-              to="/signin"
-              className="border border-ferro-primary bg-transparent text-ferro-primary rounded-button px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
-            >
-              Sign In
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="border border-ferro-primary bg-transparent text-ferro-primary rounded-button px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
+              >
+                My Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/signin"
+                className="border border-ferro-primary bg-transparent text-ferro-primary rounded-button px-6 py-2 font-semibold whitespace-nowrap transition-colors duration-fast hover:bg-ferro-primary hover:text-white no-underline"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -120,13 +131,23 @@ export default function Header() {
                 {label}
               </a>
             ))}
-            <Link
-              to="/signin"
-              className="block px-6 py-4 text-neutral-700 font-medium no-underline border-t border-neutral-100 transition-colors duration-fast hover:text-ferro-primary"
-              onClick={() => setMenuOpen(false)}
-            >
-              Sign In
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="block px-6 py-4 text-neutral-700 font-medium no-underline border-t border-neutral-100 transition-colors duration-fast hover:text-ferro-primary"
+                onClick={() => setMenuOpen(false)}
+              >
+                Your Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/signin"
+                className="block px-6 py-4 text-neutral-700 font-medium no-underline border-t border-neutral-100 transition-colors duration-fast hover:text-ferro-primary"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         )}
       </header>
