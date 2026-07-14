@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Home } from 'lucide-react'
 import { signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth'
 import type { ConfirmationResult } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
@@ -111,7 +112,17 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-[#1E7BFF] flex flex-col items-center justify-center px-4">
-      <img src={ferroLogo} alt="Ferro Maps" className="w-24 h-24 rounded-2xl mb-6" />
+      <Link
+        to="/"
+        aria-label="Home"
+        className="fixed top-6 left-6 text-white hover:text-white/70 transition-colors duration-fast"
+      >
+        <Home size={22} />
+      </Link>
+
+      <Link to="/">
+        <img src={ferroLogo} alt="Ferro Maps" className="w-24 h-24 rounded-2xl mb-6" />
+      </Link>
       <h1 className="text-3xl font-bold text-white mb-2">Ferro Maps</h1>
       <p className="text-base text-white opacity-90">London's navigation for income</p>
 
@@ -153,7 +164,17 @@ export default function SignIn() {
 
       {screen === 'otp' && (
         <>
-          <h2 className="text-white font-bold text-xl text-center mb-2 mt-8">Enter the 6-digit code</h2>
+          <div className="w-full max-w-sm mx-auto mt-8">
+            <button
+              onClick={handleGoBack}
+              className="flex items-center gap-1 text-white/70 hover:text-ferro-primary transition-colors duration-fast text-sm font-semibold"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </button>
+          </div>
+
+          <h2 className="text-white font-bold text-xl text-center mb-2 mt-4">Enter the 6-digit code</h2>
           <p className="text-white text-sm text-center mb-6 opacity-90">
             Sent to +44 {phoneNumber}
             <span onClick={handleGoBack} className="font-bold cursor-pointer underline ml-1">Edit</span>
@@ -168,6 +189,7 @@ export default function SignIn() {
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
+                  autoComplete={i === 0 ? 'one-time-code' : 'off'}
                   value={digit}
                   onChange={e => handleDigitChange(i, e.target.value)}
                   onKeyDown={e => handleDigitKeyDown(i, e)}
