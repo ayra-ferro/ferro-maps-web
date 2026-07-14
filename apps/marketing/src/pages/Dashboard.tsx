@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { signOut, updateEmail, deleteUser } from 'firebase/auth'
 import { User, History, Settings, LogOut, Menu } from 'lucide-react'
 import { useAuth } from '../context/useAuth'
@@ -389,8 +389,10 @@ export default function Dashboard() {
       {/* Sidebar (desktop only) */}
       <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen">
         <div className="px-6 py-5 flex items-center gap-3 border-b border-gray-100">
-          <img src={ferroLogo} alt="Ferro Maps" className="w-8 h-8 rounded-lg" />
-          <span className="font-bold text-ferro-primary">Ferro Maps</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={ferroLogo} alt="Ferro Maps" className="w-8 h-8 rounded-lg" />
+            <span className="font-bold text-ferro-primary">Ferro Maps</span>
+          </Link>
         </div>
 
         <nav className="flex flex-col gap-1 p-4">
@@ -425,10 +427,10 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col">
         {/* Top bar (mobile only) */}
         <div className="md:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-gray-200">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <img src={ferroLogo} alt="Ferro Maps" className="w-7 h-7 rounded-lg" />
             <span className="font-bold text-ferro-primary">Ferro Maps</span>
-          </div>
+          </Link>
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             <Menu size={22} className="text-neutral-600" />
           </button>
