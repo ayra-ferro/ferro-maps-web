@@ -1,9 +1,16 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import * as Popover from '@radix-ui/react-popover'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { Button, Card, Input } from '@ferro-maps/ui'
 import Header from '../Header'
 import Footer from '../Footer'
+import { db } from '../lib/firebase'
+
+function encodeEmailToDocId(email: string): string {
+  return email.toLowerCase().replace(/[^a-z0-9]/g, '_')
+}
 
 const COUNTRIES = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia',
@@ -33,23 +40,52 @@ const COUNTRIES = [
 ]
 
 export default function Waitlist() {
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [country, setCountry] = useState('')
   const [countryQuery, setCountryQuery] = useState('')
   const [countryOpen, setCountryOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const [consent, setConsent] = useState(false)
+  const [consentError, setConsentError] = useState('')
   const [alreadyOnList, setAlreadyOnList] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const countryInputRef = useRef<HTMLInputElement>(null)
 
   const filteredCountries = COUNTRIES.filter(c =>
     c.toLowerCase().includes(countryQuery.toLowerCase())
   )
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    console.log({ email, country, consent })
-    // TODO: Firestore write
+
+    if (!consent) {
+      setConsentError('Please agree to be contacted before joining the waitlist.')
+      return
+    }
+    setConsentError('')
+    setSubmitting(true)
+
+    try {
+      const docId = encodeEmailToDocId(email)
+      await setDoc(doc(db, 'waitlist', docId), {
+        email,
+        country,
+        signedUpAt: serverTimestamp(),
+        consentGiven: true,
+      })
+      navigate('/waitlist/confirmed')
+    } catch (unknownError: unknown) {
+      const firebaseError = unknownError as { code?: string }
+      if (firebaseError.code === 'permission-denied') {
+        setAlreadyOnList(true)
+      } else {
+        throw unknownError
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function handleCountryOpenChange(open: boolean) {
@@ -200,8 +236,10 @@ export default function Waitlist() {
                 <input
                   type="checkbox"
                   checked={consent}
-                  onChange={e => setConsent(e.target.checked)}
-                  required
+                  onChange={e => {
+                    setConsent(e.target.checked)
+                    if (e.target.checked) setConsentError('')
+                  }}
                   className="mt-0.5 accent-ferro-primary"
                 />
                 <span>
@@ -212,22 +250,14 @@ export default function Waitlist() {
                   . I can withdraw consent at any time.
                 </span>
               </label>
+              {consentError && <p className="text-xs text-red-500">{consentError}</p>}
 
-              <Button type="submit" className="w-full mt-2">
-                Join waitlist
+              <Button type="submit" className="w-full mt-2" disabled={submitting}>
+                {submitting ? 'Joining…' : 'Join waitlist'}
               </Button>
             </form>
           )}
         </Card>
-
-        {/* TEMP: remove after Firestore wiring in FM-WEB-064 */}
-        <button
-          type="button"
-          onClick={() => setAlreadyOnList(true)}
-          className="mt-6 text-xs text-gray-400 underline"
-        >
-          (dev only) simulate already on list
-        </button>
       </main>
 
       <Footer />
