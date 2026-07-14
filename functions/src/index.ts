@@ -11,6 +11,8 @@ import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import {initializeApp, getApps} from "firebase-admin/app";
 import * as crypto from "crypto";
 
+export * from "./sendWaitlistWelcomeEmail";
+
 if (getApps().length === 0) {
   initializeApp();
 }
