@@ -9,8 +9,15 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    background-color: #ffffff;
+    overscroll-behavior-y: none;
+  }
+
   body {
     font-family: 'Nunito', sans-serif;
+    background-color: #ffffff;
+    overscroll-behavior-y: none;
   }
 }
 
