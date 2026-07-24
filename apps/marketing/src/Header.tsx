@@ -148,6 +148,13 @@ export default function Header() {
                 Sign In
               </Link>
             )}
+            <Link
+                to="/waitlist"
+                className="block px-6 py-4 text-neutral-700 font-medium no-underline border-b border-neutral-100 transition-colors duration-fast hover:text-ferro-primary"
+                onClick={() => setMenuOpen(false)}
+              >
+                Join waitlist
+              </Link>
           </div>
         )}
       </header>
