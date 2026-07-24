@@ -34,7 +34,7 @@ function GooglePlayIcon() {
 
 export default function DownloadBanner() {
   const btnBase =
-    'flex items-center justify-center gap-2 bg-black text-white rounded-md px-4 py-2 w-full md:w-auto md:inline-flex'
+    'flex items-center justify-center gap-2 bg-black text-white rounded-md px-4 py-2 w-auto inline-flex'
 
   return (
     <section
@@ -65,7 +65,7 @@ export default function DownloadBanner() {
             Join Ferro Maps and know where demand is highest before you drive there.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+          <div className="flex flex-row items-center justify-center gap-3 md:gap-4">
             <a
               href="https://apps.apple.com"
               target="_blank"
